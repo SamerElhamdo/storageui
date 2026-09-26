@@ -28,6 +28,7 @@ import {
   renameEntryAction,
   signFileUrlAction,
   signFileUrlsAction,
+  signShareUrlAction,
   signUploadUrlAction,
 } from "@/app/actions/files"
 
@@ -221,6 +222,7 @@ type FileOps = {
   ) => Promise<FileSystemLoadChildrenResult>
   signFileUrl: (key: string) => Promise<string>
   signFileUrls: (keys: string[]) => Promise<Record<string, string>>
+  signShareUrl: (key: string, expiresIn: number) => Promise<string>
   signUploadUrl: (key: string, contentType?: string) => Promise<SignedUpload>
   /** Direct server/browser upload — used where presigning isn't possible. */
   uploadFile: (
@@ -241,6 +243,7 @@ function serverOps(ref: ConnectionRef): FileOps {
     listFolder: (prefix, cursor) => listFolderAction(ref, prefix, cursor),
     signFileUrl: (key) => signFileUrlAction(ref, key),
     signFileUrls: (keys) => signFileUrlsAction(ref, keys),
+    signShareUrl: (key, expiresIn) => signShareUrlAction(ref, key, expiresIn),
     signUploadUrl: (key, contentType) =>
       signUploadUrlAction(ref, key, contentType),
     uploadFile: async (key, file, onProgress) => {
@@ -301,6 +304,8 @@ async function makeClientOps(connection: Connection): Promise<FileOps> {
       clientFileOps.listFolder(files, prefix, cursor),
     signFileUrl: (key) => clientFileOps.signFileUrl(files, key),
     signFileUrls: (keys) => clientFileOps.signFileUrls(files, keys),
+    signShareUrl: (key, expiresIn) =>
+      clientFileOps.signShareUrl(files, key, expiresIn),
     signUploadUrl: async (key, contentType) => {
       assertWritable()
       return clientFileOps.signUploadUrl(files, key, contentType)
@@ -568,6 +573,20 @@ export function useS3FileSystem(connection: Connection | null): S3FileSystem {
     [opsPromise]
   )
 
+  const shareFile = React.useCallback(
+    async (item: FileSystemFileItem, expiresIn: number) => {
+      const ops = await opsPromise
+      if (!ops) throw new Error("No active connection")
+      try {
+        const key = item.key ?? item.path
+        return await ops.signShareUrl(key, expiresIn)
+      } catch (err) {
+        throw new Error(errorMessage(err))
+      }
+    },
+    [opsPromise]
+  )
+
   return {
     items,
     loadChildren,
@@ -578,6 +597,7 @@ export function useS3FileSystem(connection: Connection | null): S3FileSystem {
     deleteEntry,
     renameEntry,
     moveEntry,
+    shareFile,
     refresh,
     thumbnailHandle,
     isLoading: Boolean(

@@ -38,6 +38,15 @@ export async function signFileUrlAction(
   return fileOps.signFileUrl(resolveFiles(ref), key)
 }
 
+/** Presigned temporary share URL with a caller-specified expiry (seconds). */
+export async function signShareUrlAction(
+  ref: ConnectionRef,
+  key: string,
+  expiresIn: number
+): Promise<string> {
+  return fileOps.signShareUrl(resolveFiles(ref), key, expiresIn)
+}
+
 export async function signFileUrlsAction(
   ref: ConnectionRef,
   keys: string[]

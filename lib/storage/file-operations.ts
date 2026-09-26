@@ -305,6 +305,22 @@ export async function signFileUrl(
   }
 }
 
+const MAX_SHARE_EXPIRES_IN = 86400 // 24 hours
+
+/** Presigned GET URL with a caller-specified expiry, capped at 24 hours. */
+export async function signShareUrl(
+  files: FilesClient,
+  key: string,
+  expiresIn: number
+): Promise<string> {
+  const clamped = Math.min(Math.max(1, expiresIn), MAX_SHARE_EXPIRES_IN)
+  try {
+    return await files.url(key, { expiresIn: clamped })
+  } catch (error) {
+    throw normalizeError(error)
+  }
+}
+
 /** Batched presign. A key that fails is omitted rather than failing the batch. */
 export async function signFileUrls(
   files: FilesClient,

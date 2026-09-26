@@ -131,6 +131,10 @@ export type FileSystemProps = {
   ) => void | Promise<void>
   isStarred?: (item: FileSystemFileItem) => boolean
   onToggleStar?: (item: FileSystemFileItem) => void
+  onShareFile?: (
+    item: FileSystemFileItem,
+    expiresIn: number
+  ) => Promise<string>
   onFileOpen?: (file: FileSystemFileItem, url: string | null) => void
   getFileUrl?: (file: FileSystemFileItem) => string | Promise<string>
   loadChildren?: (
