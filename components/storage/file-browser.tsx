@@ -140,6 +140,7 @@ export function FileBrowser() {
     deleteEntry,
     renameEntry,
     moveEntry,
+    shareFile,
     refresh,
     thumbnailHandle,
     isLoading,
@@ -391,6 +392,7 @@ export function FileBrowser() {
         }
         isStarred={(item) => starredKeys.has(item.key ?? item.path)}
         onToggleStar={(item) => toggleStar(bucketKey, toMarkedFile(item))}
+        onShareFile={(item, expiresIn) => shareFile(item, expiresIn)}
         onPathChangeAction={(path) =>
           setFolder({ connId: activeConnection.id, path })
         }

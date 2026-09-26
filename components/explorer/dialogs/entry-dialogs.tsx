@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
+import { toast } from "sonner"
 
 import { usePreferencesStore } from "@/lib/store/preferences-store"
 import { cn } from "@/lib/utils"
@@ -17,6 +18,13 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
   FileSystemFolderGlyph,
   FileTypeIcon,
   formatByteSize,
@@ -26,9 +34,10 @@ import {
 } from "@/components/explorer/internals"
 import type {
   FileSystemEntry,
+  FileSystemFileItem,
   FileSystemIndex,
 } from "@/components/explorer/types"
-import { AppIcon, ArrowRight01Icon } from "@/components/foundations/icons"
+import { AppIcon, ArrowRight01Icon, Share08Icon } from "@/components/foundations/icons"
 
 type BulkProgress = { done: number; total: number }
 
@@ -572,6 +581,160 @@ export function DeleteEntriesDialog({
             >
               {tc("delete")}
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      ) : null}
+    </Dialog>
+  )
+}
+
+const SHARE_EXPIRY_OPTIONS = [
+  { labelKey: "shareExpiry5m" as const, value: 300 },
+  { labelKey: "shareExpiry15m" as const, value: 900 },
+  { labelKey: "shareExpiry1h" as const, value: 3600 },
+  { labelKey: "shareExpiry6h" as const, value: 21600 },
+  { labelKey: "shareExpiry24h" as const, value: 86400 },
+]
+
+export function ShareFileDialog({
+  file,
+  onOpenChangeAction,
+  onShareAction,
+}: {
+  file: FileSystemFileItem | null
+  onOpenChangeAction: (open: boolean) => void
+  onShareAction: (
+    file: FileSystemFileItem,
+    expiresIn: number
+  ) => Promise<string>
+}) {
+  const t = useTranslations("Dialogs")
+  const tc = useTranslations("Common")
+  const open = file !== null
+  const [expiresIn, setExpiresIn] = React.useState(3600)
+  const [shareUrl, setShareUrl] = React.useState<string | null>(null)
+  const [isCreating, setIsCreating] = React.useState(false)
+
+  // Reset state when dialog opens for a new file
+  const prevFileKey = React.useRef<string | null>(null)
+  const fileKey = file ? (file.key ?? file.path) : null
+  if (fileKey !== prevFileKey.current) {
+    prevFileKey.current = fileKey
+    if (file) {
+      setShareUrl(null)
+      setExpiresIn(3600)
+      setIsCreating(false)
+    }
+  }
+
+  async function handleCreate() {
+    if (!file) return
+    setIsCreating(true)
+    try {
+      const url = await onShareAction(file, expiresIn)
+      setShareUrl(url)
+    } catch {
+      toast.error(t("shareError"))
+    } finally {
+      setIsCreating(false)
+    }
+  }
+
+  async function handleCopy() {
+    if (!shareUrl) return
+    try {
+      await navigator.clipboard.writeText(shareUrl)
+      toast.success(t("shareCopied"))
+    } catch {
+      toast.error(t("shareCopyError"))
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChangeAction}>
+      {file ? (
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <div className="flex items-center gap-3">
+              <FileTypeIcon fileName={file.name} className="size-7" />
+              <div className="min-w-0">
+                <DialogTitle className="truncate text-left">
+                  {t("shareFileTitle")}
+                </DialogTitle>
+                <DialogDescription className="text-left">
+                  {t("shareDescription", { name: file.name })}
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+          <DialogPanel>
+            {shareUrl ? (
+              <div className="space-y-2">
+                <p className="text-sm font-medium">{t("shareLinkLabel")}</p>
+                <div className="flex gap-2">
+                  <Input
+                    readOnly
+                    value={shareUrl}
+                    className="min-w-0 flex-1 font-mono text-xs"
+                  />
+                  <Button type="button" variant="outline" onClick={handleCopy}>
+                    {t("shareCopy")}
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <p className="text-sm font-medium">{t("shareExpiry")}</p>
+                <Select
+                  value={expiresIn}
+                  onValueChange={(v) => setExpiresIn(Number(v))}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue>
+                      {(() => {
+                        const opt = SHARE_EXPIRY_OPTIONS.find(
+                          (o) => o.value === expiresIn
+                        )
+                        return opt ? t(opt.labelKey) : null
+                      })()}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {SHARE_EXPIRY_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {t(opt.labelKey)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </DialogPanel>
+          <DialogFooter>
+            {shareUrl ? (
+              <Button type="button" onClick={() => onOpenChangeAction(false)}>
+                {tc("done")}
+              </Button>
+            ) : (
+              <>
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={isCreating}
+                  onClick={() => onOpenChangeAction(false)}
+                >
+                  {tc("cancel")}
+                </Button>
+                <Button
+                  type="button"
+                  loading={isCreating}
+                  onClick={() => void handleCreate()}
+                >
+                  <AppIcon icon={Share08Icon} />
+                  {isCreating ? t("shareCreating") : t("shareCreateLink")}
+                </Button>
+              </>
+            )}
           </DialogFooter>
         </DialogContent>
       ) : null}

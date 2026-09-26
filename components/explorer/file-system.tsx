@@ -57,6 +57,7 @@ import {
   MoveEntriesDialog,
   NewFolderDialog,
   RenameEntryDialog,
+  ShareFileDialog,
 } from "@/components/explorer/dialogs/entry-dialogs"
 import type {
   FileSystemDateFilterType,
@@ -141,6 +142,7 @@ import {
   MoveIcon,
   RotateClockwiseIcon,
   Search01Icon,
+  Share08Icon,
   Tick02Icon,
 } from "@/components/foundations/icons"
 
@@ -334,6 +336,7 @@ export function FileSystem({
   onMoveEntries,
   isStarred,
   onToggleStar,
+  onShareFile,
   onFileOpen,
   getFileUrl,
   loadChildren,
@@ -1051,6 +1054,8 @@ export function FileSystem({
   const [infoTarget, setInfoTarget] = React.useState<FileSystemEntry | null>(
     null
   )
+  const [shareTarget, setShareTarget] =
+    React.useState<FileSystemFileItem | null>(null)
   const [deleteTargets, setDeleteTargets] = React.useState<FileSystemEntry[]>(
     []
   )
@@ -2231,6 +2236,18 @@ export function FileSystem({
                       <AppIcon icon={InformationCircleIcon} />
                       {t("getInfo")}
                     </ContextMenuItem>
+                    {onShareFile && contextMenuEntry.kind === "file" ? (
+                      <ContextMenuItem
+                        onClick={() =>
+                          setShareTarget(
+                            contextMenuEntry as FileSystemFileItem
+                          )
+                        }
+                      >
+                        <AppIcon icon={Share08Icon} />
+                        {t("share")}
+                      </ContextMenuItem>
+                    ) : null}
                     {onDownloadEntry ||
                     onRenameEntryAction ||
                     onMoveEntry ||
@@ -2396,6 +2413,15 @@ export function FileSystem({
               if (!open) setInfoTarget(null)
             }}
           />
+          {onShareFile ? (
+            <ShareFileDialog
+              file={shareTarget}
+              onOpenChangeAction={(open) => {
+                if (!open) setShareTarget(null)
+              }}
+              onShareAction={onShareFile}
+            />
+          ) : null}
           <DeleteEntriesDialog
             error={deleteEntryError}
             isPending={isDeletingEntry}
