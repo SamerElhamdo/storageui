@@ -11,6 +11,7 @@ import {
   SESSION_MAX_AGE_SECONDS,
   verifyCredentials,
 } from "@/lib/auth/core"
+import { afterLoginPath } from "@/lib/auth/after-login"
 import { verifyTurnstile } from "@/lib/auth/turnstile"
 
 export type LoginState = { error: string | null }
@@ -47,7 +48,7 @@ export async function loginAction(
     maxAge: SESSION_MAX_AGE_SECONDS,
   })
 
-  redirect("/")
+  redirect(afterLoginPath(String(formData.get("next") ?? "")))
 }
 
 export async function logoutAction(): Promise<void> {

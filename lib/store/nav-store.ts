@@ -7,12 +7,19 @@ import { create } from "zustand"
 
 export type BrowseSection = "all" | "recents" | "starred"
 
+/** A folder to open from the URL (`?bucket=…&path=…`); `nonce` remounts the browser there. */
+export type DeepLink = { connId: string; path: string; nonce: number }
+
 type NavStore = {
   section: BrowseSection
   setSection: (section: BrowseSection) => void
+  deepLink: DeepLink | null
+  setDeepLink: (deepLink: DeepLink | null) => void
 }
 
 export const useNavStore = create<NavStore>((set) => ({
   section: "all",
   setSection: (section) => set({ section }),
+  deepLink: null,
+  setDeepLink: (deepLink) => set({ deepLink }),
 }))

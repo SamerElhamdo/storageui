@@ -193,6 +193,12 @@ export function FileBrowser() {
     path: "",
   })
   const currentPath = folder.connId === activeConnection?.id ? folder.path : ""
+  // A link (`?bucket=…&path=…`, DeepLinkSync) opens its folder by remounting FileSystem there.
+  const deepLink = useNavStore((state) => state.deepLink)
+  const linked = deepLink && deepLink.connId === activeConnection?.id ? deepLink : null
+  React.useEffect(() => {
+    if (linked) setFolder({ connId: linked.connId, path: linked.path })
+  }, [linked])
   const [isDragging, setIsDragging] = React.useState(false)
   const dragDepth = React.useRef(0)
   // Bumped after a mutation (upload/delete/rename) and passed to FileSystem as
@@ -296,7 +302,7 @@ export function FileBrowser() {
       onDrop={handleDrop}
     >
       <FileSystem
-        key={activeConnection.id}
+        key={`${activeConnection.id}:${linked?.nonce ?? 0}`}
         items={items}
         isLoading={isLoading}
         reloadToken={refreshNonce}
@@ -323,7 +329,7 @@ export function FileBrowser() {
           "min-h-0 flex-1 rounded-none border-0",
           section !== "all" && "hidden"
         )}
-        defaultPath={currentPath}
+        defaultPath={linked && folder.path !== linked.path ? linked.path : currentPath}
         loadChildren={loadChildren}
         getFileUrl={getFileUrl}
         renderFilePreview={renderFilePreview}

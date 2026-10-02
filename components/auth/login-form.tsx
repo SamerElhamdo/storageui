@@ -26,6 +26,10 @@ export function LoginForm({
     INITIAL_STATE
   )
 
+  // A folder link that bounced through sign-in (`?bucket=…&path=…`) goes on to that folder.
+  const [next, setNext] = React.useState("")
+  React.useEffect(() => setNext(window.location.search), [])
+
   const turnstileRef = React.useRef<TurnstileInstance | null>(null)
   React.useEffect(() => {
     if (state.error) turnstileRef.current?.reset()
@@ -46,6 +50,7 @@ export function LoginForm({
       </div>
 
       <form action={formAction} className="space-y-6">
+        <input type="hidden" name="next" value={next} />
         <div className="grid grid-cols-[6rem_1fr] items-center gap-x-5 gap-y-4">
           <label htmlFor="username" className="text-sm font-medium">
             {t("username")}
