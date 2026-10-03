@@ -19,13 +19,9 @@ import { usePreferencesStore } from "@/lib/store/preferences-store"
 import { cn } from "@/lib/utils"
 import { Button } from "@heroui/react"
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogPanel,
-  DialogTitle,
+  Modal,
+  ModalFooter,
+  ModalHeader,
 } from "@heroui/react"
 import { Input } from "@heroui/react"
 import {
@@ -34,7 +30,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@heroui/react"
+} from "@/components/ui/select"
 import {
   FileSystemFolderGlyph,
   FileTypeIcon,
@@ -108,16 +104,16 @@ export function NewFolderDialog({
   const t = useTranslations("Dialogs")
   const tc = useTranslations("Common")
   return (
-    <Modal open={open} onOpenChange={onOpenChangeAction}>
+    <Modal isOpen={open} onOpenChange={onOpenChangeAction}>
       {open ? (
-        <ModalContent className="max-w-sm">
+        <div className="max-w-sm">
           <ModalHeader>
-            <ModalTitle>{t("newFolderTitle")}</ModalTitle>
-            <ModalDescription>
+            <h2 className="text-lg font-semibold">{t("newFolderTitle")}</h2>
+            <p className="text-sm text-muted-foreground">
               {t("newFolderDescription", { folder: currentFolderName })}
-            </ModalDescription>
+            </p>
           </ModalHeader>
-          <ModalPanel>
+          <div className="p-6">
             <Form
               id="new-folder-form"
               className="grid gap-2"
@@ -137,12 +133,12 @@ export function NewFolderDialog({
                 <p className="text-sm text-destructive">{error}</p>
               ) : null}
             </Form>
-          </ModalPanel>
+          </div>
           <ModalFooter>
             <Button
               type="button"
               variant="outline"
-              disabled={isPending}
+              isDisabled={isPending}
               onClick={() => onOpenChangeAction(false)}
             >
               {tc("cancel")}
@@ -150,13 +146,12 @@ export function NewFolderDialog({
             <Button
               type="submit"
               form="new-folder-form"
-              loading={isPending}
-              disabled={!name.trim()}
+              isDisabled={!name.trim()}
             >
               {t("create")}
             </Button>
           </ModalFooter>
-        </ModalContent>
+        </div>
       ) : null}
     </Modal>
   )
@@ -191,20 +186,20 @@ export function RenameEntryDialog({
   }
 
   return (
-    <Modal open={open} onOpenChange={onOpenChangeAction}>
+    <Modal isOpen={open} onOpenChange={onOpenChangeAction}>
       {entry ? (
-        <ModalContent className="max-w-sm">
+        <div className="max-w-sm">
           <ModalHeader>
-            <ModalTitle>
+            <h2 className="text-lg font-semibold">
               {entry.kind === "folder"
                 ? t("renameFolderTitle")
                 : t("renameFileTitle")}
-            </ModalTitle>
-            <ModalDescription>
+            </h2>
+            <p className="text-sm text-muted-foreground">
               {t("renameDescription", { name: entry.name })}
-            </ModalDescription>
+            </p>
           </ModalHeader>
-          <ModalPanel>
+          <div className="p-6">
             <Form
               id="rename-entry-form"
               className="grid gap-2"
@@ -226,12 +221,12 @@ export function RenameEntryDialog({
                 <p className="text-sm text-destructive">{error}</p>
               ) : null}
             </Form>
-          </ModalPanel>
+          </div>
           <ModalFooter>
             <Button
               type="button"
               variant="outline"
-              disabled={isPending}
+              isDisabled={isPending}
               onClick={() => onOpenChangeAction(false)}
             >
               {tc("cancel")}
@@ -239,13 +234,12 @@ export function RenameEntryDialog({
             <Button
               type="submit"
               form="rename-entry-form"
-              loading={isPending}
-              disabled={!name.trim()}
+              isDisabled={!name.trim()}
             >
               {t("rename")}
             </Button>
           </ModalFooter>
-        </ModalContent>
+        </div>
       ) : null}
     </Modal>
   )
@@ -324,20 +318,20 @@ export function MoveEntriesDialog({
   const segments = pathSegments(navPath)
 
   return (
-    <Modal open={open} onOpenChange={onOpenChangeAction}>
+    <Modal isOpen={open} onOpenChange={onOpenChangeAction}>
       {open ? (
-        <ModalContent className="max-w-md">
+        <div className="max-w-md">
           <ModalHeader>
-            <ModalTitle>
+            <h2 className="text-lg font-semibold">
               {targets.length > 1
                 ? t("moveItemsTitle", { count: targets.length })
                 : targets[0].kind === "folder"
                   ? t("moveFolderTitle")
                   : t("moveFileTitle")}
-            </ModalTitle>
-            <ModalDescription>{t("moveDescription")}</ModalDescription>
+            </h2>
+            <p className="text-sm text-muted-foreground">{t("moveDescription")}</p>
           </ModalHeader>
-          <ModalPanel className="space-y-2">
+          <div className="space-y-2 p-6">
             {/* Breadcrumb of the browsing path. */}
             <div className="flex flex-wrap items-center gap-0.5 text-sm">
               <button
@@ -401,20 +395,19 @@ export function MoveEntriesDialog({
             {progress ? (
               <BulkProgressBar verb={t("moving")} progress={progress} />
             ) : null}
-          </ModalPanel>
+          </div>
           <ModalFooter>
             <Button
               type="button"
               variant="outline"
-              disabled={isPending}
+              isDisabled={isPending}
               onClick={() => onOpenChangeAction(false)}
             >
               {tc("cancel")}
             </Button>
             <Button
               type="button"
-              loading={isPending}
-              disabled={!canMoveHere}
+              isDisabled={!canMoveHere}
               onClick={() => onMoveAction(navPath)}
             >
               {navPath === ""
@@ -424,7 +417,7 @@ export function MoveEntriesDialog({
                   })}
             </Button>
           </ModalFooter>
-        </ModalContent>
+        </div>
       ) : null}
     </Modal>
   )
@@ -461,7 +454,7 @@ export function InfoEntryDialog({
   const modified = formatTimestamp(entry?.updatedAt, timeFormat)
 
   return (
-    <Drawer open={open} onOpenChange={onOpenChangeAction} backdrop="blur">
+    <Drawer isOpen={open} onOpenChange={onOpenChangeAction}>
 
       {entry ? (
         <DrawerContent className="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col border-l border-border bg-background p-6 shadow-2xl">
@@ -557,54 +550,53 @@ export function DeleteEntriesDialog({
   const open = targets.length > 0
 
   return (
-    <Modal open={open} onOpenChange={onOpenChangeAction}>
+    <Modal isOpen={open} onOpenChange={onOpenChangeAction}>
       {open ? (
-        <ModalContent className="max-w-sm">
+        <div className="max-w-sm">
           <ModalHeader>
-            <ModalTitle>
+            <h2 className="text-lg font-semibold">
               {targets.length > 1
                 ? t("deleteItemsTitle", { count: targets.length })
                 : targets[0].kind === "folder"
                   ? t("deleteFolderTitle")
                   : t("deleteFileTitle")}
-            </ModalTitle>
-            <ModalDescription>
+            </h2>
+            <p className="text-sm text-muted-foreground">
               {targets.length > 1
                 ? t("deleteItemsDescription", { count: targets.length })
                 : targets[0].kind === "folder"
                   ? t("deleteFolderDescription", { name: targets[0].name })
                   : t("deleteFileDescription", { name: targets[0].name })}
-            </ModalDescription>
+            </p>
           </ModalHeader>
           {error || progress ? (
-            <ModalPanel className="space-y-2">
+            <div className="space-y-2 p-6">
               {error ? (
                 <p className="text-sm text-destructive">{error}</p>
               ) : null}
               {progress ? (
                 <BulkProgressBar verb={t("deleting")} progress={progress} />
               ) : null}
-            </ModalPanel>
+            </div>
           ) : null}
           <ModalFooter>
             <Button
               type="button"
               variant="outline"
-              disabled={isPending}
+              isDisabled={isPending}
               onClick={() => onOpenChangeAction(false)}
             >
               {tc("cancel")}
             </Button>
             <Button
               type="button"
-              variant="destructive"
-              loading={isPending}
+              variant="danger"
               onClick={onSubmitAction}
             >
               {tc("delete")}
             </Button>
           </ModalFooter>
-        </ModalContent>
+        </div>
       ) : null}
     </Modal>
   )
@@ -673,23 +665,23 @@ export function ShareFileDialog({
   }
 
   return (
-    <Modal open={open} onOpenChange={onOpenChangeAction}>
+    <Modal isOpen={open} onOpenChange={onOpenChangeAction}>
       {file ? (
-        <ModalContent className="max-w-md">
+        <div className="max-w-md">
           <ModalHeader>
             <div className="flex items-center gap-3">
               <FileTypeIcon fileName={file.name ?? file.path} className="size-7" />
               <div className="min-w-0">
-                <ModalTitle className="truncate text-left">
+                <h2 className="truncate text-left text-lg font-semibold">
                   {t("shareFileTitle")}
-                </ModalTitle>
-                <ModalDescription className="text-left">
+                </h2>
+                <p className="text-left text-sm text-muted-foreground">
                   {t("shareDescription", { name: file.name ?? file.path })}
-                </ModalDescription>
+                </p>
               </div>
             </div>
           </ModalHeader>
-          <ModalPanel>
+          <div className="p-6">
             {shareUrl ? (
               <div className="space-y-2">
                 <p className="text-sm font-medium">{t("shareLinkLabel")}</p>
@@ -731,7 +723,7 @@ export function ShareFileDialog({
                 </Select>
               </div>
             )}
-          </ModalPanel>
+          </div>
           <ModalFooter>
             {shareUrl ? (
               <Button type="button" onClick={() => onOpenChangeAction(false)}>
@@ -742,14 +734,13 @@ export function ShareFileDialog({
                 <Button
                   type="button"
                   variant="outline"
-                  disabled={isCreating}
+                  isDisabled={isCreating}
                   onClick={() => onOpenChangeAction(false)}
                 >
                   {tc("cancel")}
                 </Button>
                 <Button
                   type="button"
-                  loading={isCreating}
                   onClick={() => void handleCreate()}
                 >
                   <AppIcon icon={Share08Icon} />
@@ -758,7 +749,7 @@ export function ShareFileDialog({
               </>
             )}
           </ModalFooter>
-        </ModalContent>
+        </div>
       ) : null}
     </Modal>
   )

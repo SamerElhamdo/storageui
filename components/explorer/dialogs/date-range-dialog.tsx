@@ -6,12 +6,9 @@ import { useLocale, useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Button } from "@heroui/react"
 import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogPanel,
-  DialogTitle,
+  Modal,
+  ModalFooter,
+  ModalHeader,
 } from "@heroui/react"
 import { Input } from "@heroui/react"
 import {
@@ -314,16 +311,16 @@ export function FileSystemDateRangeDialog({
 
   return (
     <Modal
-      open
-      onOpenChange={(open) => {
+      isOpen
+      onOpenChange={(open: boolean) => {
         if (!open) onCloseAction()
       }}
     >
-      <ModalContent className="w-120 max-w-[calc(100vw-2rem)]">
+      <div className="w-120 max-w-[calc(100vw-2rem)]">
         <ModalHeader>
-          <ModalTitle>{t("dateRangeTitle")}</ModalTitle>
+          <h2 className="text-lg font-semibold">{t("dateRangeTitle")}</h2>
         </ModalHeader>
-        <ModalPanel className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 p-6">
           <div className="flex gap-3">
             {dateField(t("from"), fromInput, (value) => {
               setFromInput(value)
@@ -355,14 +352,14 @@ export function FileSystemDateRangeDialog({
               </Button>
             ))}
           </div>
-        </ModalPanel>
+        </div>
         <ModalFooter>
           <Button type="button" variant="outline" onClick={onCloseAction}>
             {tc("cancel")}
           </Button>
           <Button
             type="button"
-            disabled={!range.from || !range.to}
+            isDisabled={!range.from || !range.to}
             onClick={() => {
               if (!range.from || !range.to) return
 
@@ -377,7 +374,7 @@ export function FileSystemDateRangeDialog({
             {tc("apply")}
           </Button>
         </ModalFooter>
-      </ModalContent>
+      </div>
     </Modal>
   )
 }

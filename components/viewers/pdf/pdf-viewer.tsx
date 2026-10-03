@@ -63,13 +63,7 @@ import { flushSync } from "react-dom"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@heroui/react"
-import {
-  Dropdown,
-  DropdownContent,
-  DropdownItem,
-  DropdownSeparator,
-  DropdownTrigger,
-} from "@heroui/react"
+import { Dropdown } from "@heroui/react"
 import { Input } from "@heroui/react"
 import {
   Popover,
@@ -83,7 +77,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@heroui/react"
+} from "@/components/ui/select"
 import { Separator } from "@heroui/react"
 import { Spinner } from "@heroui/react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
@@ -577,34 +571,39 @@ function PDFViewerFileActionsMenu({
         />
       ) : null}
       <Dropdown>
-        <DropdownTrigger asChild>
+        <Dropdown.Trigger>
           <Button
             type="button"
             variant="ghost"
-            size="icon-sm"
+            size={undefined}
             aria-label={t("pdfActions")}
           >
             <AppIcon icon={MoreHorizontalIcon} className="size-4" />
           </Button>
-        </DropdownTrigger>
-        <DropdownContent align="end" className="w-40">
-          {showDownload && onDownload ? (
-            <DropdownItem disabled={downloadDisabled} onClick={onDownload}>
-              {isPreparingDownload ? (
-                <Spinner className="size-4" />
-              ) : (
-                <AppIcon icon={Download01Icon} className="size-4" />
-              )}
-              {t("download")}
-            </DropdownItem>
-          ) : null}
-          {showUpload && onUploadFile ? (
-            <DropdownItem onClick={() => inputRef.current?.click()}>
-              <AppIcon icon={Upload01Icon} className="size-4" />
-              {t("upload")}
-            </DropdownItem>
-          ) : null}
-        </DropdownContent>
+        </Dropdown.Trigger>
+        <Dropdown.Popover className="w-40">
+          <Dropdown.Menu>
+            {showDownload && onDownload ? (
+              <Dropdown.Item
+                isDisabled={downloadDisabled}
+                onClick={onDownload}
+              >
+                {isPreparingDownload ? (
+                  <Spinner className="size-4" />
+                ) : (
+                  <AppIcon icon={Download01Icon} className="size-4" />
+                )}
+                {t("download")}
+              </Dropdown.Item>
+            ) : null}
+            {showUpload && onUploadFile ? (
+              <Dropdown.Item onClick={() => inputRef.current?.click()}>
+                <AppIcon icon={Upload01Icon} className="size-4" />
+                {t("upload")}
+              </Dropdown.Item>
+            ) : null}
+          </Dropdown.Menu>
+        </Dropdown.Popover>
       </Dropdown>
     </>
   )
@@ -658,7 +657,7 @@ function PDFViewerPageNumberControl({
           aria-label={t("pageNumber")}
           inputMode="numeric"
           pattern="[0-9]*"
-          size="sm"
+          size={undefined}
           value={draftPage}
           className="mx-1 w-14 min-w-14 rounded-md **:data-[slot=input]:text-center"
           onBlur={() => setIsEditing(false)}
@@ -678,10 +677,10 @@ function PDFViewerPageNumberControl({
         <Button
           type="button"
           variant="ghost"
-          size="sm"
+          size={undefined}
           className="font-normal"
           aria-label={t("currentPage", { page: displayPage })}
-          disabled={controlsDisabled || !numPages}
+          isDisabled={controlsDisabled || !numPages}
           onClick={() => {
             setDraftPage(String(displayPage))
             setIsEditing(true)
@@ -857,19 +856,22 @@ function PDFViewerSearchControl({
   return (
     <Popover>
       <ToolbarTooltip label={t("searchText")}>
-        <PopoverTrigger asChild>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-sm"
-            aria-label={t("searchText")}
-            disabled={controlsDisabled}
-          >
-            <AppIcon icon={Search01Icon} className="size-4" />
-          </Button>
-        </PopoverTrigger>
+        <PopoverTrigger
+          render={(props) => (
+            <Button
+              {...props}
+              type="button"
+              variant="ghost"
+              size="sm"
+              aria-label={t("searchText")}
+              isDisabled={controlsDisabled}
+            >
+              <AppIcon icon={Search01Icon} className="size-4" />
+            </Button>
+          )}
+        />
       </ToolbarTooltip>
-      <PopoverContent align="end" className="w-72">
+      <PopoverContent className="w-72">
         <div className="space-y-3">
           <Input
             placeholder={t("searchText")}
@@ -907,7 +909,7 @@ function PDFViewerSearchControl({
               <Button
                 type="button"
                 variant="outline"
-                size="icon-sm"
+                size="sm"
                 aria-label={t("prevResult")}
                 disabled={isSearching || state.total === 0}
                 onClick={() => navigate(-1)}
@@ -917,7 +919,7 @@ function PDFViewerSearchControl({
               <Button
                 type="button"
                 variant="outline"
-                size="icon-sm"
+                size="sm"
                 aria-label={t("nextResult")}
                 disabled={isSearching || state.total === 0}
                 onClick={() => navigate(1)}
@@ -930,7 +932,7 @@ function PDFViewerSearchControl({
             <Button
               type="button"
               variant="outline"
-              size="sm"
+              size={undefined}
               onClick={clearSearch}
             >
               Clear
@@ -2252,7 +2254,7 @@ function PDFViewerInner({
                   <Button
                     type="button"
                     variant="ghost"
-                    size="icon-sm"
+                    size="sm"
                     aria-label={t("toggleThumbnails")}
                     disabled={controlsDisabled}
                     onClick={() => setSidebarOpen((open) => !open)}
@@ -2278,7 +2280,7 @@ function PDFViewerInner({
                       <Button
                         type="button"
                         variant="ghost"
-                        size="icon-sm"
+                        size="sm"
                         aria-label={t("rotateCcw")}
                         disabled={controlsDisabled}
                         onClick={() => rotateSelectedPages(-1)}
@@ -2293,7 +2295,7 @@ function PDFViewerInner({
                       <Button
                         type="button"
                         variant="ghost"
-                        size="icon-sm"
+                        size="sm"
                         aria-label={t("rotateCw")}
                         disabled={controlsDisabled}
                         onClick={() => rotateSelectedPages(1)}
@@ -2316,7 +2318,7 @@ function PDFViewerInner({
                   <Button
                     type="button"
                     variant="ghost"
-                    size="icon-sm"
+                    size="sm"
                     aria-label={t("zoomOut")}
                     disabled={
                       controlsDisabled || currentZoomLevel <= ZOOM_OPTIONS[0]
@@ -2355,7 +2357,7 @@ function PDFViewerInner({
                   <Button
                     type="button"
                     variant="ghost"
-                    size="icon-sm"
+                    size="sm"
                     aria-label={t("zoomIn")}
                     disabled={
                       controlsDisabled ||

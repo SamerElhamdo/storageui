@@ -1,4 +1,4 @@
-import { SidebarInset, SidebarProvider } from "@heroui/react"
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
 import { AddConnectionDialog } from "@/components/connections/add-connection-dialog"
 import { ConnectionStoreHydrator } from "@/components/connections/connection-store-hydrator"

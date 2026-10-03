@@ -14,12 +14,9 @@ import {
 } from "@/lib/store/preferences-store"
 import { useIsMobile } from "@/hooks/use-media-query"
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogPanel,
-  DialogTitle,
+  Modal,
+  ModalFooter,
+  ModalHeader,
 } from "@heroui/react"
 import {
   Select,
@@ -27,9 +24,9 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@heroui/react"
+} from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
-import { Tabs, TabsList, TabsPanel, TabsTab } from "@heroui/react"
+import { Tabs, TabList, Tab, TabPanel } from "@heroui/react"
 import { AppIcon, ExternalLinkIcon } from "@/components/foundations/icons"
 import { Logo } from "@/components/foundations/logo"
 import { setLocale } from "@/app/actions/locale"
@@ -96,33 +93,32 @@ export function SettingsDialog({
     })
   }
   return (
-    <Modal open={open} onOpenChange={onOpenChangeAction}>
+    <Modal isOpen={open} onOpenChange={onOpenChangeAction}>
       {open ? (
-        <ModalContent className="max-w-2xl">
+        <div className="max-w-2xl">
           <ModalHeader>
-            <ModalTitle>{t("title")}</ModalTitle>
-            <ModalDescription>{t("description")}</ModalDescription>
+            <h2 className="text-lg font-semibold">{t("title")}</h2>
+            <p className="text-sm text-muted-foreground">{t("description")}</p>
           </ModalHeader>
 
-          <ModalPanel className="pt-2">
+          <div className="pt-2">
             <Tabs
               className="h-80 w-full gap-5"
-              defaultValue="general"
+              defaultSelectedKey="general"
               orientation={isMobile ? "horizontal" : "vertical"}
-              size={isMobile ? "sm" : "default"}
             >
-              <TabsList
+              <TabList
                 className={
                   isMobile ? "shrink-0 self-start" : "w-36 shrink-0 self-start"
                 }
               >
-                <TabsTab value="general">{t("tabGeneral")}</TabsTab>
-                <TabsTab value="advanced">{t("tabAdvanced")}</TabsTab>
-                <TabsTab value="about">{t("tabAbout")}</TabsTab>
-              </TabsList>
+                <Tab id="general">{t("tabGeneral")}</Tab>
+                <Tab id="advanced">{t("tabAdvanced")}</Tab>
+                <Tab id="about">{t("tabAbout")}</Tab>
+              </TabList>
 
-              <TabsPanel
-                value="general"
+              <TabPanel
+                id="general"
                 className="min-h-0 min-w-0 overflow-y-auto pe-1"
               >
                 <div className="divide-y">
@@ -214,10 +210,10 @@ export function SettingsDialog({
                     </Select>
                   </div>
                 </div>
-              </TabsPanel>
+              </TabPanel>
 
-              <TabsPanel
-                value="advanced"
+              <TabPanel
+                id="advanced"
                 className="min-h-0 min-w-0 overflow-y-auto pe-1"
               >
                 <div className="divide-y">
@@ -281,10 +277,10 @@ export function SettingsDialog({
                     />
                   </label>
                 </div>
-              </TabsPanel>
+              </TabPanel>
 
-              <TabsPanel
-                value="about"
+              <TabPanel
+                id="about"
                 className="min-h-0 min-w-0 overflow-y-auto pe-1"
               >
                 <div className="flex items-center gap-3 border-b pb-4">
@@ -335,10 +331,10 @@ export function SettingsDialog({
                     </dd>
                   </div>
                 </dl>
-              </TabsPanel>
+              </TabPanel>
             </Tabs>
-          </ModalPanel>
-        </ModalContent>
+          </div>
+        </div>
       ) : null}
     </Modal>
   )

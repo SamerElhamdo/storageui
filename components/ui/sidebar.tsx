@@ -17,9 +17,9 @@ import {
   SheetHeader,
   SheetPopup,
   SheetTitle,
-} from "@heroui/react"
+} from "@/components/ui/sheet"
 import { Skeleton } from "@heroui/react"
-import { Tooltip, TooltipPopup, TooltipTrigger } from "@heroui/react"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@heroui/react"
 import { AppIcon, SidebarLeftIcon } from "@/components/foundations/icons"
 
 const SIDEBAR_COOKIE_NAME: string = "sidebar_state"
@@ -288,11 +288,11 @@ export function SidebarTrigger({
       className={cn("size-7", className)}
       data-sidebar="trigger"
       data-slot="sidebar-trigger"
-      onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+      onClick={(event) => {
         onClick?.(event)
         toggleSidebar()
       }}
-      size="icon"
+      size="sm"
       variant="ghost"
       {...props}
     >
@@ -540,7 +540,7 @@ export function SidebarMenuButton({
   ...props
 }: useRender.ComponentProps<"button"> & {
   isActive?: boolean
-  tooltip?: string | React.ComponentProps<typeof TooltipPopup>
+  tooltip?: string | React.ComponentProps<typeof TooltipContent>
   asChild?: boolean
 } & VariantProps<typeof sidebarMenuButtonVariants>): React.ReactElement {
   const { isMobile, state } = useSidebar()
@@ -580,12 +580,18 @@ export function SidebarMenuButton({
   return (
     <Tooltip>
       <TooltipTrigger
-        render={buttonElement as React.ReactElement<Record<string, unknown>>}
+        render={(props) => (
+          <button
+            {...props}
+            type="button"
+            className="inline-flex"
+          >
+            {buttonElement}
+          </button>
+        )}
       />
-      <TooltipPopup
-        align="center"
+      <TooltipContent
         hidden={state !== "collapsed" || isMobile}
-        side="right"
         {...tooltip}
       />
     </Tooltip>

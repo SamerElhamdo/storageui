@@ -32,7 +32,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@heroui/react"
+} from "@/components/ui/select"
 import { Separator } from "@heroui/react"
 import { Spinner } from "@heroui/react"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"

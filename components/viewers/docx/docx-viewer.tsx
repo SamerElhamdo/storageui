@@ -16,15 +16,7 @@ import { useVirtualizer } from "@tanstack/react-virtual"
 import { useTranslations } from "next-intl"
 
 import { cn } from "@/lib/utils"
-import { Button } from "@heroui/react"
-import {
-  Dropdown,
-  DropdownCheckboxItem,
-  DropdownContent,
-  DropdownItem,
-  DropdownSeparator,
-  DropdownTrigger,
-} from "@heroui/react"
+import { Button, Dropdown } from "@heroui/react"
 import { Input } from "@heroui/react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import {
@@ -33,20 +25,15 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@heroui/react"
+} from "@/components/ui/select"
 import { Separator } from "@heroui/react"
 import { Spinner } from "@heroui/react"
-import {
-  Tooltip,
-  TooltipContent,
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@heroui/react"
 import { TooltipProvider } from "@/components/ui/tooltip"
-  TooltipTrigger,
-} from "@heroui/react"
 import { FileThumbnail } from "@/components/explorer/file-thumbnail"
 import {
   AppIcon,
@@ -307,10 +294,10 @@ function ToolbarTooltip({
 }) {
   return (
     <Tooltip>
-      <TooltipTrigger asChild>
-        <span className="inline-flex">{children}</span>
-      </TooltipTrigger>
-      <TooltipContent side="bottom">{label}</TooltipContent>
+      <TooltipTrigger
+        render={<span className="inline-flex">{children}</span>}
+      />
+      <TooltipContent>{label}</TooltipContent>
     </Tooltip>
   )
 }
@@ -359,64 +346,61 @@ function DocxFileActionsMenu({
 
   return (
     <Dropdown>
-      <DropdownTrigger asChild>
+      <Dropdown.Trigger>
         <Button
           type="button"
           variant="ghost"
-          size="icon-sm"
+          size={undefined}
           aria-label={t("docxActions")}
         >
           <AppIcon icon={MoreHorizontalIcon} className="size-4" />
         </Button>
-      </DropdownTrigger>
-      <DropdownContent align="end" className="w-52">
-        {showNightRenderToggle ? (
-          <>
-            <DropdownCheckboxItem
-              checked={isDark}
-              disabled={controlsDisabled}
-              variant="switch"
-              onCheckedChange={(checked) => onIsDarkChange(checked === true)}
-            >
-              <span className="flex min-w-0 items-center gap-2">
+      </Dropdown.Trigger>
+      <Dropdown.Popover placement="bottom end" className="w-52">
+        <Dropdown.Menu>
+          {showNightRenderToggle ? (
+            <>
+              <Dropdown.Item
+                onClick={() => onIsDarkChange(!isDark)}
+                className="flex items-center gap-2"
+              >
                 <AppIcon icon={Moon02Icon} className="size-4" />
                 {t("darkMode")}
-              </span>
-            </DropdownCheckboxItem>
-            <DropdownSeparator />
-          </>
-        ) : null}
-        <DropdownCheckboxItem
-          checked={showDocumentMarkup}
-          disabled={controlsDisabled}
-          variant="switch"
-          onCheckedChange={(checked) =>
-            onShowDocumentMarkupChange(checked === true)
-          }
-        >
-          <span className="flex min-w-0 items-center gap-2">
+                <Dropdown.ItemIndicator type="checkmark" />
+              </Dropdown.Item>
+              <div className="my-1 h-px bg-border" />
+            </>
+          ) : null}
+          <Dropdown.Item
+            onClick={() => onShowDocumentMarkupChange(!showDocumentMarkup)}
+            className="flex items-center gap-2"
+          >
             <AppIcon icon={Comment01Icon} className="size-4" />
             {t("commentsEdits")}
-          </span>
-        </DropdownCheckboxItem>
-        {showFileActions ? <DropdownSeparator /> : null}
-        {showDownloadButton ? (
-          <DropdownItem disabled={downloadDisabled} onClick={onDownload}>
-            {isPreparingDownload ? (
-              <Spinner className="size-4" />
-            ) : (
-              <AppIcon icon={Download01Icon} className="size-4" />
-            )}
-            {t("download")}
-          </DropdownItem>
-        ) : null}
-        {showUploadButton ? (
-          <DropdownItem onClick={onUploadClick}>
-            <AppIcon icon={Upload01Icon} className="size-4" />
-            {t("upload")}
-          </DropdownItem>
-        ) : null}
-      </DropdownContent>
+            <Dropdown.ItemIndicator type="checkmark" />
+          </Dropdown.Item>
+          {showFileActions ? <div className="my-1 h-px bg-border" /> : null}
+          {showDownloadButton ? (
+            <Dropdown.Item
+              isDisabled={downloadDisabled}
+              onClick={onDownload}
+            >
+              {isPreparingDownload ? (
+                <Spinner className="size-4" />
+              ) : (
+                <AppIcon icon={Download01Icon} className="size-4" />
+              )}
+              {t("download")}
+            </Dropdown.Item>
+          ) : null}
+          {showUploadButton ? (
+            <Dropdown.Item onClick={onUploadClick}>
+              <AppIcon icon={Upload01Icon} className="size-4" />
+              {t("upload")}
+            </Dropdown.Item>
+          ) : null}
+        </Dropdown.Menu>
+      </Dropdown.Popover>
     </Dropdown>
   )
 }
@@ -476,7 +460,7 @@ function DocxPageNumberControl({
           aria-label={t("pageNumber")}
           inputMode="numeric"
           pattern="[0-9]*"
-          size="sm"
+          size={undefined}
           value={draftPage}
           className="mx-1 w-14 min-w-14 rounded-md **:data-[slot=input]:text-center"
           onBlur={() => setIsEditing(false)}
@@ -496,10 +480,10 @@ function DocxPageNumberControl({
         <Button
           type="button"
           variant="ghost"
-          size="sm"
+          size={undefined}
           className="font-normal"
           aria-label={t("currentPage", { page: displayPage })}
-          disabled={controlsDisabled || !pageCount}
+          isDisabled={controlsDisabled || !pageCount}
           onClick={() => {
             setDraftPage(String(displayPage))
             setIsEditing(true)
@@ -582,9 +566,9 @@ function DocxToolbar({
             <Button
               type="button"
               variant="ghost"
-              size="icon-sm"
+              size={undefined}
               aria-label={t("toggleThumbnails")}
-              disabled={controlsDisabled}
+              isDisabled={controlsDisabled}
               onClick={onToggleSidebar}
             >
               <AppIcon icon={SidebarLeftIcon} className="size-4" />
@@ -603,8 +587,8 @@ function DocxToolbar({
               <Button
                 type="button"
                 variant="ghost"
-                size="icon-sm"
-                disabled={controlsDisabled || !canZoomOut}
+                size={undefined}
+                isDisabled={controlsDisabled || !canZoomOut}
                 aria-label={t("zoomOut")}
                 onClick={() =>
                   setZoomScale((currentZoomScale) =>
@@ -618,11 +602,11 @@ function DocxToolbar({
             <Select
               value={zoomScale.toString()}
               onValueChange={(value) => setZoomScale(Number(value))}
-              disabled={controlsDisabled}
+              isDisabled={controlsDisabled}
               modal={false}
             >
               <SelectTrigger
-                size="sm"
+                size={undefined}
                 className="w-21 min-w-21"
                 aria-label={t("zoomLevel")}
               >
@@ -640,8 +624,8 @@ function DocxToolbar({
               <Button
                 type="button"
                 variant="ghost"
-                size="icon-sm"
-                disabled={controlsDisabled || !canZoomIn}
+                size={undefined}
+                isDisabled={controlsDisabled || !canZoomIn}
                 aria-label={t("zoomIn")}
                 onClick={() =>
                   setZoomScale((currentZoomScale) =>
@@ -1534,7 +1518,7 @@ function DocxViewerContent({
                 <Button
                   type="button"
                   variant="outline"
-                  size="sm"
+                  size={undefined}
                   className="mt-4"
                   onClick={() => fileInputRef.current?.click()}
                 >

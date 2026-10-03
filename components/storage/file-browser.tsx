@@ -23,7 +23,7 @@ import { useUploadUiStore } from "@/lib/store/upload-ui-store"
 import { cn } from "@/lib/utils"
 import { Badge } from "@heroui/react"
 import { Button } from "@heroui/react"
-import { SidebarTrigger } from "@heroui/react"
+import { SidebarTrigger } from "@/components/ui/sidebar"
 import { FileSystem } from "@/components/explorer/file-system"
 import { ImageThumbnailPreview } from "@/components/explorer/image-thumbnail-preview"
 import type {
@@ -48,7 +48,6 @@ function MobileSidebarTrigger() {
   return (
     <SidebarTrigger
       aria-label={t("openSidebar")}
-      title={t("openSidebar")}
       className="shrink-0 min-[800px]:hidden"
     />
   )
@@ -335,7 +334,7 @@ export function FileBrowser() {
         title={activeConnection.name}
         titleBadge={
           isReadOnly ? (
-            <Badge variant="outline" className={NEUTRAL_BADGE_CLASSNAME}>
+            <Badge variant="secondary" className={NEUTRAL_BADGE_CLASSNAME}>
               {t("readOnly")}
             </Badge>
           ) : undefined

@@ -96,7 +96,7 @@ export function LoginForm({
           />
         ) : null}
 
-        <Button type="submit" loading={isPending}>
+        <Button type="submit" isDisabled={isPending}>
           {t("signIn")}
         </Button>
       </form>

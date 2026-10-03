@@ -5,11 +5,9 @@ import { Command as CommandPrimitive } from "cmdk"
 
 import { cn } from "@/lib/utils"
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
+  Modal,
+  ModalFooter,
+  ModalHeader,
 } from "@heroui/react"
 import { AppIcon, Search01Icon } from "@/components/foundations/icons"
 
@@ -36,7 +34,7 @@ function CommandDialog({
   className,
   showCloseButton = true,
   ...props
-}: Omit<React.ComponentProps<typeof Dialog>, "children"> & {
+}: Omit<React.ComponentProps<typeof Modal>, "children"> & {
   title?: string
   description?: string
   className?: string
@@ -46,17 +44,14 @@ function CommandDialog({
   return (
     <Modal {...props}>
       <ModalHeader className="sr-only">
-        <ModalTitle>{title}</ModalTitle>
-        <ModalDescription>{description}</ModalDescription>
+        <h2>{title}</h2>
+        <p>{description}</p>
       </ModalHeader>
-      <ModalContent
-        className={cn("overflow-hidden p-0", className)}
-        showCloseButton={showCloseButton}
-      >
+      <div className={cn("overflow-hidden p-0", className)}>
         <Command className="**:data-[slot=command-input-wrapper]:h-12 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]]:px-2 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:size-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:size-5">
           {children}
         </Command>
-      </ModalContent>
+      </div>
     </Modal>
   )
 }

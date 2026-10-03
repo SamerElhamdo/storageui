@@ -15,12 +15,12 @@ function trackedChangeBadgeVariant(
   switch (kind) {
     case "insertion":
     case "move-to":
-      return "success"
+      return "primary"
     case "deletion":
     case "move-from":
-      return "error"
+      return "primary"
     default:
-      return "warning"
+      return "secondary"
   }
 }
 
@@ -45,7 +45,7 @@ function trackedChangeBadgeLabel({
 function DocxAnnotationCard({
   anchorText,
   badge,
-  badgeVariant = "outline",
+  badgeVariant = "primary",
   date,
   meta,
   snippet,
@@ -118,7 +118,7 @@ export function renderDocxCommentCard({
     <DocxAnnotationCard
       anchorText={comment.anchorText}
       badge={badge}
-      badgeVariant={comment.resolved ? "secondary" : "info"}
+      badgeVariant={comment.resolved ? "secondary" : "primary"}
       date={formattedDate}
       meta={comment.author?.trim() || "Unknown author"}
       snippet={snippet}

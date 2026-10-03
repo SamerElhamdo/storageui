@@ -236,12 +236,11 @@ function ZoomBar({
   return (
     <div className="flex shrink-0 items-center justify-center gap-1 border-t px-3 py-1.5">
       <Button
-        size="icon-sm"
+        size="sm"
         variant="ghost"
         aria-label={t("zoomOut")}
-        title={t("zoomOut")}
         onClick={onZoomOut}
-        disabled={zoom <= ZOOM_MIN}
+        isDisabled={zoom <= ZOOM_MIN}
       >
         <AppIcon icon={MinusSignCircleIcon} />
       </Button>
@@ -254,12 +253,11 @@ function ZoomBar({
         {Math.round(zoom * 100)}%
       </button>
       <Button
-        size="icon-sm"
+        size="sm"
         variant="ghost"
         aria-label={t("zoomIn")}
-        title={t("zoomIn")}
         onClick={onZoomIn}
-        disabled={zoom >= ZOOM_MAX}
+        isDisabled={zoom >= ZOOM_MAX}
       >
         <AppIcon icon={PlusSignCircleIcon} />
       </Button>

@@ -8,13 +8,9 @@ import { getFileKind, type FileKind } from "@/lib/file-kind"
 import { cn } from "@/lib/utils"
 import { Button } from "@heroui/react"
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+  Modal,
+  ModalFooter,
+  ModalHeader,
 } from "@heroui/react"
 import { Spinner } from "@heroui/react"
 import type { FileSystemFileItem } from "@/components/explorer/types"
@@ -91,16 +87,13 @@ function UnsupportedFile({ fileName, url }: { fileName: string; url: string }) {
         </p>
       </div>
       <div className="flex gap-2">
-        <Button render={<a href={url} download={fileName} />}>
+        <a href={url} download={fileName} className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
           <AppIcon icon={Download01Icon} className="size-4" />
           {t("download")}
-        </Button>
-        <Button
-          variant="outline"
-          render={<a href={url} target="_blank" rel="noopener noreferrer" />}
-        >
+        </a>
+        <a href={url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium hover:bg-accent">
           {t("openInNewTab")}
-        </Button>
+        </a>
       </div>
     </div>
   )
@@ -223,10 +216,9 @@ function StarButton({
   const label = isStarred ? t("removeStar") : t("addStar")
   return (
     <Button
-      size="icon"
+      size="sm"
       variant="ghost"
       aria-label={label}
-      title={label}
       onClick={onToggleStar}
       className={isStarred ? "text-amber-500 hover:text-amber-500" : undefined}
     >
@@ -328,13 +320,12 @@ export function FileViewerDialog({
   )
 
   return (
-    <Modal open={open} onOpenChange={handleOpenChange}>
+    <Modal isOpen={open} onOpenChange={handleOpenChange}>
       {open && file ? (
-        <ModalContent
-          showCloseButton={kind === "other"}
+        <div
           className={cn("overflow-hidden", DIALOG_CLASSNAMES[kind])}
         >
-          <ModalTitle className="sr-only">{fileName}</ModalTitle>
+          <h2 className="sr-only">{fileName}</h2>
           {kind === "other" ? (
             body
           ) : (
@@ -360,7 +351,7 @@ export function FileViewerDialog({
                     <Button
                       size="sm"
                       variant="outline"
-                      disabled={status.saving}
+                      isDisabled={status.saving}
                       onClick={exitEditing}
                     >
                       {tc("done")}
@@ -369,8 +360,7 @@ export function FileViewerDialog({
                   {canEdit && editing ? (
                     <Button
                       size="sm"
-                      loading={status.saving}
-                      disabled={!status.dirty}
+                      isDisabled={!status.dirty}
                       onClick={async () => {
                         if (await codeViewerRef.current?.save()) {
                           setEditing(false)
@@ -383,8 +373,7 @@ export function FileViewerDialog({
                   {canEdit && !editing ? (
                     <Button
                       aria-label={t("edit")}
-                      title={t("edit")}
-                      size="icon-sm"
+                      size="sm"
                       variant="ghost"
                       onClick={() => setEditing(true)}
                     >
@@ -406,8 +395,7 @@ export function FileViewerDialog({
                   {kind === "text" ? (
                     <Button
                       aria-label={t("search")}
-                      title={t("search")}
-                      size="icon-sm"
+                      size="sm"
                       variant="ghost"
                       onClick={() => codeViewerRef.current?.toggleSearch()}
                     >
@@ -415,22 +403,24 @@ export function FileViewerDialog({
                     </Button>
                   ) : null}
                   {kind === "text" && url ? (
-                    <Button
+                    <a
+                      href={url}
+                      download={fileName}
                       aria-label={t("download")}
-                      title={t("download")}
-                      size="icon-sm"
-                      variant="ghost"
-                      render={<a href={url} download={fileName} />}
+                      className="inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium hover:bg-accent"
                     >
                       <AppIcon icon={Download01Icon} />
-                    </Button>
+                      {t("download")}
+                    </a>
                   ) : null}
-                  <ModalClose
+                  <Button
                     aria-label={t("close")}
-                    render={<Button size="icon" variant="ghost" />}
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleOpenChange(false)}
                   >
                     <AppIcon icon={Cancel01Icon} />
-                  </ModalClose>
+                  </Button>
                 </div>
               </div>
               <div
@@ -445,17 +435,17 @@ export function FileViewerDialog({
             </div>
           )}
           <Modal
-            open={pendingDiscard !== null}
+            isOpen={pendingDiscard !== null}
             onOpenChange={(next) => {
               if (!next) setPendingDiscard(null)
             }}
           >
-            <ModalContent className="max-w-sm">
+            <div className="max-w-sm">
               <ModalHeader>
-                <ModalTitle>{t("discardTitle")}</ModalTitle>
-                <ModalDescription>
+                <h2 className="text-lg font-semibold">{t("discardTitle")}</h2>
+                <p className="text-sm text-muted-foreground">
                   {t("discardDescription", { name: fileName })}
-                </ModalDescription>
+                </p>
               </ModalHeader>
               <ModalFooter>
                 <Button
@@ -464,13 +454,13 @@ export function FileViewerDialog({
                 >
                   {t("keepEditing")}
                 </Button>
-                <Button variant="destructive" onClick={discard}>
+                <Button variant="danger" onClick={discard}>
                   {t("discard")}
                 </Button>
               </ModalFooter>
-            </ModalContent>
+            </div>
           </Modal>
-        </ModalContent>
+        </div>
       ) : null}
     </Modal>
   )

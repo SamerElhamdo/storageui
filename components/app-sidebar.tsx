@@ -19,7 +19,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-} from "@heroui/react"
+} from "@/components/ui/sidebar"
 import { Skeleton } from "@heroui/react"
 import {
   AppIcon,
@@ -88,13 +88,13 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenu>
               <SidebarMenuItem>
                 <Button
-                  variant="default"
-                  title={
+                  variant="primary"
+                  aria-label={
                     activeConnection?.readOnly
                       ? t("readOnlyTooltip")
                       : t("uploadFiles")
                   }
-                  disabled={!activeConnection || activeConnection.readOnly}
+                  isDisabled={!activeConnection || activeConnection.readOnly}
                   onClick={() => pickFiles?.()}
                   className="w-full justify-start group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0"
                 >
@@ -171,10 +171,9 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                       {connection.source !== "env" ? (
                         <Button
                           variant="ghost"
-                          size="icon-xs"
+                          size="sm"
                           data-sidebar="menu-action"
                           aria-label={t("editConnection")}
-                          title={t("editConnection")}
                           onClick={() => openEditDialog(connection)}
                           className="absolute top-1/2 right-1 -translate-y-1/2 opacity-0 transition-opacity group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 group-data-[collapsible=icon]:hidden focus-visible:opacity-100"
                         >

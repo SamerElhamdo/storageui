@@ -15,14 +15,11 @@ import { useConnections } from "@/lib/store/connection-store"
 import { Button } from "@heroui/react"
 import { Checkbox } from "@heroui/react"
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogPanel,
-  DialogTitle,
+  Modal,
+  ModalFooter,
+  ModalHeader,
 } from "@heroui/react"
+import type { ReactNode } from "react"
 import { Input } from "@heroui/react"
 import {
   Select,
@@ -30,7 +27,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@heroui/react"
+} from "@/components/ui/select"
 import {
   AlibabaCloudIcon,
   AwsIcon,
@@ -299,32 +296,19 @@ export function AddConnectionDialog() {
   }
 
   return (
-    <Modal open={isAddDialogOpen} onOpenChange={setAddDialogOpen}>
+    <Modal isOpen={isAddDialogOpen} onOpenChange={setAddDialogOpen}>
       {isAddDialogOpen ? (
-        <ModalContent className="max-w-lg">
+        <div className="max-w-lg">
           <ModalHeader>
-            <ModalTitle>
+            <h2 className="text-lg font-semibold">
               {editingConnection ? t("editTitle") : t("addTitle")}
-            </ModalTitle>
-            <ModalDescription>
-              {editingConnection ? t("editDescription") : t("addDescription")}
-            </ModalDescription>
+            </h2>
           </ModalHeader>
 
-          <ModalPanel>
+          <div className="p-6">
             <Form
               id="add-connection-form"
               onSubmit={handleSubmit}
-              onKeyDown={(event) => {
-                if (
-                  editingConnection &&
-                  (event.metaKey || event.ctrlKey) &&
-                  event.key === "Enter"
-                ) {
-                  event.preventDefault()
-                  event.currentTarget.requestSubmit()
-                }
-              }}
               className="grid gap-4"
             >
               <Field label={t("provider")}>
@@ -514,9 +498,9 @@ export function AddConnectionDialog() {
                   </Field>
                   <label className="flex items-center gap-2 text-sm">
                     <Checkbox
-                      checked={form.forcePathStyle}
-                      onCheckedChange={(checked) =>
-                        update("forcePathStyle", checked)
+                      isSelected={form.forcePathStyle}
+                      onChange={(isSelected: boolean) =>
+                        update("forcePathStyle", isSelected)
                       }
                     />
                     <span>{t("forcePathStyle")}</span>
@@ -550,9 +534,9 @@ export function AddConnectionDialog() {
                   </Field>
                   <label className="flex items-center gap-2 text-sm">
                     <Checkbox
-                      checked={form.forcePathStyle}
-                      onCheckedChange={(checked) =>
-                        update("forcePathStyle", checked)
+                      isSelected={form.forcePathStyle}
+                      onChange={(isSelected: boolean) =>
+                        update("forcePathStyle", isSelected)
                       }
                     />
                     <span>{t("forcePathStyle")}</span>
@@ -583,9 +567,9 @@ export function AddConnectionDialog() {
                   </Field>
                   <label className="flex items-center gap-2 text-sm">
                     <Checkbox
-                      checked={form.forcePathStyle}
-                      onCheckedChange={(checked) =>
-                        update("forcePathStyle", checked)
+                      isSelected={form.forcePathStyle}
+                      onChange={(isSelected: boolean) =>
+                        update("forcePathStyle", isSelected)
                       }
                     />
                     <span>{t("forcePathStyle")}</span>
@@ -616,9 +600,9 @@ export function AddConnectionDialog() {
                   </Field>
                   <label className="flex items-center gap-2 text-sm">
                     <Checkbox
-                      checked={form.forcePathStyle}
-                      onCheckedChange={(checked) =>
-                        update("forcePathStyle", checked)
+                      isSelected={form.forcePathStyle}
+                      onChange={(isSelected: boolean) =>
+                        update("forcePathStyle", isSelected)
                       }
                     />
                     <span>{t("forcePathStyleMinio")}</span>
@@ -649,9 +633,9 @@ export function AddConnectionDialog() {
                   </Field>
                   <label className="flex items-center gap-2 text-sm">
                     <Checkbox
-                      checked={form.forcePathStyle}
-                      onCheckedChange={(checked) =>
-                        update("forcePathStyle", checked)
+                      isSelected={form.forcePathStyle}
+                      onChange={(isSelected: boolean) =>
+                        update("forcePathStyle", isSelected)
                       }
                     />
                     <span>{t("forcePathStyle")}</span>
@@ -725,13 +709,13 @@ export function AddConnectionDialog() {
                 </p>
               ) : null}
             </Form>
-          </ModalPanel>
+          </div>
 
           <ModalFooter>
             {editingConnection ? (
               <Button
                 type="button"
-                variant="destructive-outline"
+                variant="danger"
                 className="sm:me-auto"
                 onClick={() => {
                   removeConnection(editingConnection.id)
@@ -752,7 +736,7 @@ export function AddConnectionDialog() {
             <Button
               type="submit"
               form="add-connection-form"
-              disabled={!canSubmit}
+              isDisabled={!canSubmit}
             >
               {status === "testing"
                 ? t("testing")
@@ -761,7 +745,7 @@ export function AddConnectionDialog() {
                   : t("testAndSave")}
             </Button>
           </ModalFooter>
-        </ModalContent>
+        </div>
       ) : null}
     </Modal>
   )
