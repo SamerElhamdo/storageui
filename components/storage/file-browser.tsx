@@ -79,7 +79,20 @@ function fromMarkedFile(file: MarkedFile): FileSystemFileItem {
 
 function EmptyState() {
   const t = useTranslations("Browser")
-  const { openAddDialog } = useConnections()
+  const { openAddDialog, addConnection } = useConnections()
+
+  const loadDemoConnection = () => {
+    addConnection({
+      id: "demo-connection",
+      name: "Demo Storage (Mock Data)",
+      provider: "s3",
+      bucket: "demo-bucket",
+      accessKeyId: "demo",
+      secretAccessKey: "demo",
+      source: "local",
+    })
+  }
+
   return (
     <div className="flex h-full flex-col items-center justify-center p-8 text-center bg-background/50">
       <Card className="flex flex-col items-center justify-center gap-5 p-8 max-w-md w-full border border-border/80 bg-card/80 shadow-xl backdrop-blur-md">
@@ -89,18 +102,23 @@ function EmptyState() {
         <div className="space-y-1.5">
           <div className="flex items-center justify-center gap-2 mb-1">
             <h2 className="text-base font-semibold text-foreground">{t("noBucketTitle")}</h2>
-            <Chip className="bg-amber-500/10 text-amber-600 dark:text-amber-400 font-medium text-[11px] h-5 px-1.5">
-              Storage
+            <Chip className="bg-primary/10 text-primary font-medium text-[11px] h-5 px-1.5">
+              Hero UI
             </Chip>
           </div>
           <p className="max-w-sm text-xs text-muted-foreground leading-relaxed">
             {t("noBucketDescription")}
           </p>
         </div>
-        <Button size="sm" className="rounded-xl px-4 py-2 font-medium shadow-md transition-all hover:scale-105" onClick={openAddDialog}>
-          <AppIcon icon={PlusSignCircleIcon} className="size-4" />
-          {t("addConnection")}
-        </Button>
+        <div className="flex flex-col sm:flex-row items-center gap-2.5 w-full justify-center">
+          <Button size="sm" className="w-full sm:w-auto rounded-xl px-4 py-2 font-medium shadow-md transition-all hover:scale-105" onClick={loadDemoConnection}>
+            <AppIcon icon={PlusSignCircleIcon} className="size-4" />
+            عرض الواجهة بموك داتا (Demo)
+          </Button>
+          <Button size="sm" variant="outline" className="w-full sm:w-auto rounded-xl px-4 py-2 font-medium" onClick={openAddDialog}>
+            {t("addConnection")}
+          </Button>
+        </div>
       </Card>
     </div>
   )

@@ -353,6 +353,96 @@ async function makeClientOps(connection: Connection): Promise<FileOps> {
   }
 }
 
+const MOCK_DEMO_ITEMS: FileSystemItem[] = [
+  {
+    kind: "folder",
+    path: "Projects/",
+    name: "Projects",
+    updatedAt: new Date(Date.now() - 3600000 * 24 * 2).toISOString(),
+  },
+  {
+    kind: "folder",
+    path: "Design-Assets/",
+    name: "Design-Assets",
+    updatedAt: new Date(Date.now() - 3600000 * 24 * 5).toISOString(),
+  },
+  {
+    kind: "folder",
+    path: "Documents/",
+    name: "Documents",
+    updatedAt: new Date(Date.now() - 3600000 * 24 * 1).toISOString(),
+  },
+  {
+    kind: "file",
+    path: "hero-ui-design-system.png",
+    key: "hero-ui-design-system.png",
+    name: "hero-ui-design-system.png",
+    contentType: "image/png",
+    size: 2450000,
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    kind: "file",
+    path: "annual-report-2026.pdf",
+    key: "annual-report-2026.pdf",
+    name: "annual-report-2026.pdf",
+    contentType: "application/pdf",
+    size: 5120000,
+    updatedAt: new Date(Date.now() - 3600000 * 3).toISOString(),
+  },
+  {
+    kind: "file",
+    path: "app-architecture.tsx",
+    key: "app-architecture.tsx",
+    name: "app-architecture.tsx",
+    contentType: "text/typescript",
+    size: 18400,
+    updatedAt: new Date(Date.now() - 3600000 * 12).toISOString(),
+  },
+  {
+    kind: "file",
+    path: "financial-forecast.xlsx",
+    key: "financial-forecast.xlsx",
+    name: "financial-forecast.xlsx",
+    contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    size: 890000,
+    updatedAt: new Date(Date.now() - 3600000 * 48).toISOString(),
+  },
+  {
+    kind: "folder",
+    path: "Projects/StorageUI/",
+    name: "StorageUI",
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    kind: "file",
+    path: "Projects/StorageUI/package.json",
+    key: "Projects/StorageUI/package.json",
+    name: "package.json",
+    contentType: "application/json",
+    size: 4840,
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    kind: "file",
+    path: "Design-Assets/heroui-banner.jpg",
+    key: "Design-Assets/heroui-banner.jpg",
+    name: "heroui-banner.jpg",
+    contentType: "image/jpeg",
+    size: 1200000,
+    updatedAt: new Date(Date.now() - 3600000 * 10).toISOString(),
+  },
+  {
+    kind: "file",
+    path: "Documents/HeroUI-Documentation.docx",
+    key: "Documents/HeroUI-Documentation.docx",
+    name: "HeroUI-Documentation.docx",
+    contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    size: 3400000,
+    updatedAt: new Date(Date.now() - 3600000 * 6).toISOString(),
+  },
+]
+
 /** Adapts a connection's `files-sdk` client (server or direct) to FileSystem props. */
 export function useS3FileSystem(connection: Connection | null): S3FileSystem {
   const [items, setItems] = React.useState<FileSystemItem[]>([])
@@ -364,11 +454,6 @@ export function useS3FileSystem(connection: Connection | null): S3FileSystem {
   const directClientRequests = usePreferencesStore(
     (state) => state.directClientRequests
   )
-  // Only local connections can run in the browser — env credentials are blanked
-  // client-side, so those always go through the server. WebDAV is excluded: a
-  // cross-origin PROPFIND/MKCOL carrying `Authorization` needs CORS that no
-  // stock Nextcloud/ownCloud/NAS grants, and digest auth cannot work from a
-  // browser at all.
   const direct =
     directClientRequests &&
     connection?.source === "local" &&
@@ -379,18 +464,26 @@ export function useS3FileSystem(connection: Connection | null): S3FileSystem {
     [connection]
   )
 
-  // Resolve the transport once per (connection, direct) pair. In direct mode the
-  // client `FilesClient` is built a single time behind this memoized promise.
   const opsPromise = React.useMemo<Promise<FileOps | null>>(() => {
-    if (!ref || !connection) return Promise.resolve(null)
+    if (!connection) return Promise.resolve(null)
+    if (connection.id === "demo-connection") return Promise.resolve(null)
+    if (!ref) return Promise.resolve(null)
     return direct ? makeClientOps(connection) : Promise.resolve(serverOps(ref))
   }, [ref, connection, direct])
 
   // Load the bucket root whenever the active connection or transport changes.
   React.useEffect(() => {
-    if (!ref) {
+    if (!connection) {
       setItems([])
       setLoadedConnection(null)
+      setError(null)
+      return
+    }
+
+    if (connection.id === "demo-connection") {
+      setItems(MOCK_DEMO_ITEMS)
+      setLoadedConnection(connection)
+      setIsLoading(false)
       setError(null)
       return
     }
