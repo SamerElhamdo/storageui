@@ -18,6 +18,7 @@
     "allFiles": "All Files",
     "recents": "Recents",
     "starred": "Starred",
+    "media": "Media",
     "connections": "Connections",
     "noConnections": "No connections yet",
     "addConnection": "Add connection",
@@ -363,5 +364,22 @@
     "sortDescending": "Sort descending",
     "clear": "Clear",
     "unknownAuthor": "Unknown author"
+  },
+  "Media": {
+    "title": "Media",
+    "contents": "Bucket contents",
+    "contentsHint": "What's stored in this bucket. This is not a capacity limit.",
+    "images": "Images",
+    "videos": "Videos",
+    "other": "Other",
+    "fileCount": "{count, plural, one {# file} other {# files}}",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "unknownDay": "Unknown date",
+    "play": "Play video",
+    "loadingMore": "Loading more…",
+    "loadError": "Couldn't load media",
+    "emptyTitle": "No photos or videos",
+    "emptyDescription": "This bucket has no images or videos yet."
   }
 }

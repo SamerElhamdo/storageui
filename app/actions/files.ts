@@ -9,6 +9,8 @@ import {
 } from "@/lib/storage/connections-server"
 import * as fileOps from "@/lib/storage/file-operations"
 import type { EntryRef, SignedUpload } from "@/lib/storage/files-client"
+import type { MediaPageResult, MediaSummary } from "@/lib/storage/media"
+import { listMediaPage, mediaSummary } from "@/lib/storage/media-index"
 import type { FileSystemLoadChildrenResult } from "@/components/explorer/types"
 
 /** The env connections, with credentials stripped, for the sidebar. */
@@ -19,6 +21,24 @@ export async function listEnvConnectionsAction(): Promise<Connection[]> {
 /** Validate a connection's credentials + CORS with one cheap round trip. */
 export async function testConnectionAction(ref: ConnectionRef): Promise<void> {
   return fileOps.probeConnection(resolveFiles(ref))
+}
+
+/**
+ * One page of images and videos across the whole bucket, newest first.
+ * Auth is the proxy (`fs_session`), same as {@link listFolderAction}.
+ */
+export async function listMediaAction(
+  ref: ConnectionRef,
+  cursor: string | null
+): Promise<MediaPageResult> {
+  return listMediaPage(ref, cursor)
+}
+
+/** Chart aggregate. Cached in server memory; not tied to grid paging. */
+export async function mediaSummaryAction(
+  ref: ConnectionRef
+): Promise<MediaSummary> {
+  return mediaSummary(ref)
 }
 
 /** One page of a folder, mapped to the FileSystem manifest shape. */

@@ -7,6 +7,8 @@ const assetPrefix = process.env.NEXT_PUBLIC_ASSET_PREFIX ?? ""
 const nextConfig = {
   basePath,
   assetPrefix,
+  // Optional so a second `next dev` can run beside one already using `.next`.
+  ...(process.env.NEXT_DIST_DIR ? { distDir: process.env.NEXT_DIST_DIR } : {}),
   devIndicators: false,
   reactCompiler: true,
   typescript: {

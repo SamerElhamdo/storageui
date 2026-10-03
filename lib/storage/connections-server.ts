@@ -18,12 +18,14 @@ import {
 import {
   ENV_CONNECTION_ID,
   ENV_CONNECTION_ID_PREFIX,
+  MOCK_CONNECTION_ID,
   WEBDAV_AUTH_TYPES,
   type Connection,
   type ConnectionProvider,
   type WebdavAuthType,
 } from "@/lib/storage/connections"
 import type { FilesClient } from "@/lib/storage/files-client"
+import { createMockFiles, isStorageMockEnabled } from "@/lib/storage/mock-files"
 
 export type { FilesClient }
 
@@ -158,9 +160,26 @@ function slotToConnection(raw: RawEnvSlot, id: string): Connection | null {
   }
 }
 
+function mockEnvConnection(): Connection {
+  return {
+    id: MOCK_CONNECTION_ID,
+    name: "Mock library",
+    provider: "s3",
+    bucket: "mock-library",
+    region: "us-east-1",
+    accessKeyId: "",
+    secretAccessKey: "",
+    readOnly: true,
+    source: "env",
+  }
+}
+
 /** Every env-configured connection, with real credentials. Server-only. */
 function loadEnvConnections(): Connection[] {
   const connections: Connection[] = []
+
+  // Dev-only, no keys. Ignored when NODE_ENV is production.
+  if (isStorageMockEnabled()) connections.push(mockEnvConnection())
 
   const legacy = slotToConnection(LEGACY_ENV_SLOT, ENV_CONNECTION_ID)
   if (legacy) connections.push(legacy)
@@ -191,6 +210,10 @@ export function listPublicEnvConnections(): Connection[] {
 
 function buildFiles(connection: Connection): FilesClient {
   const readonly = connection.readOnly
+
+  if (connection.source === "env" && connection.id === MOCK_CONNECTION_ID) {
+    return createMockFiles()
+  }
 
   if (connection.provider === "webdav") {
     if (!connection.endpoint) {

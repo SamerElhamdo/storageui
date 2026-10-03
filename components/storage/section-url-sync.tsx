@@ -2,7 +2,11 @@
 
 import * as React from "react"
 
-import { useNavStore, type BrowseSection } from "@/lib/store/nav-store"
+import {
+  browseSectionFromSegment,
+  type BrowseSection,
+} from "@/lib/browse-section"
+import { useNavStore } from "@/lib/store/nav-store"
 
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ""
 
@@ -10,16 +14,15 @@ const SECTION_PATH: Record<BrowseSection, string> = {
   all: BASE_PATH || "/",
   recents: `${BASE_PATH}/recents`,
   starred: `${BASE_PATH}/starred`,
+  media: `${BASE_PATH}/media`,
 }
 
 function sectionFromPathname(pathname: string): BrowseSection {
   let rest = pathname
   if (BASE_PATH && rest.startsWith(BASE_PATH))
     rest = rest.slice(BASE_PATH.length)
-  const segment = rest.replace(/^\/+|\/+$/g, "").toLowerCase()
-  if (segment === "recents") return "recents"
-  if (segment === "starred") return "starred"
-  return "all"
+  const segment = rest.replace(/^\/+|\/+$/g, "").split("/")[0]
+  return browseSectionFromSegment(segment)
 }
 
 export function SectionUrlSync() {

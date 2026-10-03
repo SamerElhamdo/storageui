@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl"
 import { getFileKind } from "@/lib/file-kind"
 import { useS3FileSystem } from "@/lib/storage/hooks/use-file-system"
 import { expandDropEntries, useUploads } from "@/lib/storage/hooks/use-uploads"
+import type { MediaBootstrap } from "@/lib/storage/media"
 import {
   bucketBrowserKey,
   DEFAULT_BUCKET_BROWSER_SETTINGS,
@@ -16,7 +17,7 @@ import {
   useFileMarksStore,
   type MarkedFile,
 } from "@/lib/store/file-marks-store"
-import { useNavStore } from "@/lib/store/nav-store"
+import { useNavStore, type BrowseSection } from "@/lib/store/nav-store"
 import { usePreferencesStore } from "@/lib/store/preferences-store"
 import { useUploadUiStore } from "@/lib/store/upload-ui-store"
 import { cn } from "@/lib/utils"
@@ -38,6 +39,7 @@ import {
 import { NEUTRAL_BADGE_CLASSNAME } from "@/components/storage/badge-styles"
 import { FileViewerDialog } from "@/components/storage/file-viewer-dialog"
 import { MarkedFilesView } from "@/components/storage/marked-files-view"
+import { MediaLibrary } from "@/components/storage/media-library"
 import { UploadProgressPanel } from "@/components/storage/upload-progress-panel"
 
 const EMPTY_MARKS: MarkedFile[] = []
@@ -98,7 +100,13 @@ function EmptyState() {
   )
 }
 
-export function FileBrowser() {
+export function FileBrowser({
+  initialSection = "all",
+  initialMedia = null,
+}: {
+  initialSection?: BrowseSection
+  initialMedia?: MediaBootstrap | null
+}) {
   const t = useTranslations("Browser")
   const { activeConnection, hasHydrated } = useConnections()
   const isReadOnly = activeConnection?.readOnly === true
@@ -116,7 +124,14 @@ export function FileBrowser() {
     (state) => state.showImagePreviews
   )
   const showHiddenFiles = usePreferencesStore((state) => state.showHiddenFiles)
-  const section = useNavStore((state) => state.section)
+  const storeSection = useNavStore((state) => state.section)
+  // The nav store starts at "all". Until the URL effect runs, trust the section
+  // the server rendered so /media is in the first HTML payload.
+  const [sectionSynced, setSectionSynced] = React.useState(false)
+  React.useEffect(() => {
+    setSectionSynced(true)
+  }, [])
+  const section = sectionSynced ? storeSection : initialSection
   const recents = useFileMarksStore(
     (state) => state.buckets[bucketKey]?.recents ?? EMPTY_MARKS
   )
@@ -195,7 +210,8 @@ export function FileBrowser() {
   const currentPath = folder.connId === activeConnection?.id ? folder.path : ""
   // A link (`?bucket=…&path=…`, DeepLinkSync) opens its folder by remounting FileSystem there.
   const deepLink = useNavStore((state) => state.deepLink)
-  const linked = deepLink && deepLink.connId === activeConnection?.id ? deepLink : null
+  const linked =
+    deepLink && deepLink.connId === activeConnection?.id ? deepLink : null
   React.useEffect(() => {
     if (linked) setFolder({ connId: linked.connId, path: linked.path })
   }, [linked])
@@ -261,6 +277,22 @@ export function FileBrowser() {
   // Until the persisted store rehydrates, we don't yet know if a bucket is
   // connected — render nothing rather than flashing the "No bucket" empty state.
   if (!hasHydrated) {
+    if (section === "media") {
+      return (
+        <div className="relative flex h-full min-h-0 flex-col">
+          <MediaLibrary
+            connection={null}
+            connectionName={initialMedia?.connectionName}
+            headerLeading={<MobileSidebarTrigger />}
+            thumbnailHandle={
+              initialMedia ? `e_${initialMedia.connectionId}` : null
+            }
+            getFileUrl={async () => ""}
+            initialMedia={initialMedia}
+          />
+        </div>
+      )
+    }
     return <div className="h-full" />
   }
 
@@ -329,7 +361,9 @@ export function FileBrowser() {
           "min-h-0 flex-1 rounded-none border-0",
           section !== "all" && "hidden"
         )}
-        defaultPath={linked && folder.path !== linked.path ? linked.path : currentPath}
+        defaultPath={
+          linked && folder.path !== linked.path ? linked.path : currentPath
+        }
         loadChildren={loadChildren}
         getFileUrl={getFileUrl}
         renderFilePreview={renderFilePreview}
@@ -405,7 +439,16 @@ export function FileBrowser() {
         onFileOpen={openFile}
       />
 
-      {section !== "all" ? (
+      {section === "media" ? (
+        <MediaLibrary
+          connection={activeConnection}
+          headerLeading={<MobileSidebarTrigger />}
+          thumbnailHandle={thumbnailHandle}
+          getFileUrl={getFileUrl}
+          onOpenAction={openFile}
+          initialMedia={initialMedia}
+        />
+      ) : section !== "all" ? (
         <MarkedFilesView
           section={section}
           connectionName={activeConnection.name}

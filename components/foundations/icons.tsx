@@ -58,6 +58,7 @@ export {
   IconCircleMinus as MinusSignCircleIcon,
   IconMoon as Moon02Icon,
   IconDots as MoreHorizontalIcon,
+  IconPlayerPlay as PlayIcon,
   IconCirclePlus as PlusSignCircleIcon,
   IconRotateClockwise as RotateClockwiseIcon,
   IconSearch as Search01Icon,

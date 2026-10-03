@@ -55,7 +55,7 @@ cp .env.example .env.local
 bun run dev
 ```
 
-Open `http://localhost:3000`. You can add a storage connection from the UI, or preconfigure server-side buckets by filling the `STORAGE_1_*` variables in `.env.local`.
+Open `http://localhost:3000`. You can add a storage connection from the UI, or preconfigure server-side buckets by filling the `STORAGE_1_*` variables in `.env.local`. Set `STORAGE_MOCK=1` to browse a fake bucket with no credentials (see `.env.example`).
 
 ## License
 

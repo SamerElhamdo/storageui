@@ -5,7 +5,9 @@
 // it resets to "all" on reload, so it isn't persisted.
 import { create } from "zustand"
 
-export type BrowseSection = "all" | "recents" | "starred"
+import type { BrowseSection } from "@/lib/browse-section"
+
+export type { BrowseSection }
 
 /** A folder to open from the URL (`?bucket=…&path=…`); `nonce` remounts the browser there. */
 export type DeepLink = { connId: string; path: string; nonce: number }

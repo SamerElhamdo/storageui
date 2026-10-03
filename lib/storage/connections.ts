@@ -76,6 +76,11 @@ export type Connection = {
 
 /** Stable id of the legacy single-bucket env connection. */
 export const ENV_CONNECTION_ID = "env"
+/**
+ * Dev-only bucket injected when `STORAGE_MOCK=1` (see connections-server).
+ * Not a provider the add-connection form offers.
+ */
+export const MOCK_CONNECTION_ID = "mock"
 /** Prefix for indexed env connections, e.g. `env-1`, `env-2`. */
 export const ENV_CONNECTION_ID_PREFIX = "env-"
 

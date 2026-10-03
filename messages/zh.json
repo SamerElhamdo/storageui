@@ -18,6 +18,7 @@
     "allFiles": "全部文件",
     "recents": "最近",
     "starred": "收藏",
+    "media": "媒体",
     "connections": "连接",
     "noConnections": "暂无连接",
     "addConnection": "添加连接",
@@ -363,5 +364,22 @@
     "sortDescending": "降序排序",
     "clear": "清除",
     "unknownAuthor": "未知作者"
+  },
+  "Media": {
+    "title": "媒体",
+    "contents": "存储桶内容",
+    "contentsHint": "这里统计的是已有文件，不是容量配额。",
+    "images": "图片",
+    "videos": "视频",
+    "other": "其他",
+    "fileCount": "{count, plural, other {# 个文件}}",
+    "today": "今天",
+    "yesterday": "昨天",
+    "unknownDay": "未知日期",
+    "play": "播放视频",
+    "loadingMore": "正在加载更多…",
+    "loadError": "无法加载媒体",
+    "emptyTitle": "没有照片或视频",
+    "emptyDescription": "这个存储桶里还没有图片或视频。"
   }
 }

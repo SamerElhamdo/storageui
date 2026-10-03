@@ -28,6 +28,7 @@ import {
   FavouriteIcon,
   FolderLibraryIcon,
   HardDriveIcon,
+  Image01Icon,
   LogoutIcon,
   PlusSignCircleIcon,
   Settings01Icon,
@@ -38,7 +39,7 @@ import { SettingsDialog } from "@/components/settings/settings-dialog"
 import { isAuthEnabledAction, logoutAction } from "@/app/actions/auth"
 
 type BrowseItem = {
-  labelKey: "allFiles" | "recents" | "starred"
+  labelKey: "allFiles" | "recents" | "starred" | "media"
   icon: typeof FolderLibraryIcon
   section: BrowseSection
 }
@@ -47,6 +48,7 @@ const BROWSE: BrowseItem[] = [
   { labelKey: "allFiles", icon: FolderLibraryIcon, section: "all" },
   { labelKey: "recents", icon: Clock01Icon, section: "recents" },
   { labelKey: "starred", icon: FavouriteIcon, section: "starred" },
+  { labelKey: "media", icon: Image01Icon, section: "media" },
 ]
 
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
