@@ -23,6 +23,8 @@ export type MediaListItem = {
   updatedAt?: string
   etag?: string
   kind: "image" | "video"
+  /** Playable length in seconds, when the listing knows it. */
+  durationSeconds?: number
 }
 
 export type MediaPageResult = {

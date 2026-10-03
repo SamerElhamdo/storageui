@@ -445,7 +445,11 @@ export function FileBrowser({
           headerLeading={<MobileSidebarTrigger />}
           thumbnailHandle={thumbnailHandle}
           getFileUrl={getFileUrl}
-          onOpenAction={openFile}
+          onOpenAction={(file) => recordRecent(bucketKey, toMarkedFile(file))}
+          isStarredAction={(key) => starredKeys.has(key)}
+          onToggleStarAction={(file) =>
+            toggleStar(bucketKey, toMarkedFile(file))
+          }
           initialMedia={initialMedia}
         />
       ) : section !== "all" ? (

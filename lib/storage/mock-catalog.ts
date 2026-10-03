@@ -12,6 +12,8 @@ export type MockSeed = {
   /** Noon UTC so the calendar day is stable across nearby time zones. */
   updatedAt: string
   contentType: string
+  /** Real playable length, seconds. Only set for videos. */
+  durationSeconds?: number
 }
 
 const DAY = {
@@ -65,12 +67,14 @@ export const MOCK_SEEDS: readonly MockSeed[] = [
     size: 18_400_000,
     updatedAt: DAY.oct3,
     contentType: "video/mp4",
+    durationSeconds: 4,
   },
   {
     key: "videos/2026-10-03/market-crowd.mp4",
     size: 22_100_000,
     updatedAt: DAY.oct3,
     contentType: "video/mp4",
+    durationSeconds: 8,
   },
 
   // 2026-10-02 — 5 images, 1 video, 1 other
@@ -109,6 +113,7 @@ export const MOCK_SEEDS: readonly MockSeed[] = [
     size: 15_600_000,
     updatedAt: DAY.oct2,
     contentType: "video/mp4",
+    durationSeconds: 3,
   },
   {
     key: "docs/2026-10-02/shot-list.pdf",
@@ -147,12 +152,14 @@ export const MOCK_SEEDS: readonly MockSeed[] = [
     size: 19_800_000,
     updatedAt: DAY.oct1,
     contentType: "video/mp4",
+    durationSeconds: 6,
   },
   {
     key: "videos/2026-10-01/river-pass.mp4",
     size: 12_400_000,
     updatedAt: DAY.oct1,
     contentType: "video/mp4",
+    durationSeconds: 5,
   },
 
   // 2026-09-28 — 3 images, 2 other
@@ -205,6 +212,7 @@ export const MOCK_SEEDS: readonly MockSeed[] = [
     size: 27_500_000,
     updatedAt: DAY.sep20,
     contentType: "video/mp4",
+    durationSeconds: 11,
   },
   {
     key: "archive/2026-09-20/selects.zip",

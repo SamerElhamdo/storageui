@@ -20,6 +20,8 @@ import { Spinner } from "@/components/ui/spinner"
 import type { FileSystemFileItem } from "@/components/explorer/types"
 import {
   AppIcon,
+  ArrowLeft01Icon,
+  ArrowRight01Icon,
   Cancel01Icon,
   Download01Icon,
   Edit02Icon,
@@ -197,7 +199,14 @@ function ViewerBody({
       return (
         <div className="aspect-video w-full overflow-hidden rounded-lg bg-black">
           <React.Suspense fallback={<ViewerFallback />}>
-            <LazyVideoPlayer src={url} controls width="100%" height="100%" />
+            <LazyVideoPlayer
+              key={url}
+              src={url}
+              controls
+              playsInline
+              width="100%"
+              height="100%"
+            />
           </React.Suspense>
         </div>
       )
@@ -246,6 +255,11 @@ export function FileViewerDialog({
   isStarred = false,
   onToggleStarAction,
   onSaveAction,
+  hasPrevious = false,
+  hasNext = false,
+  onPreviousAction,
+  onNextAction,
+  loading = false,
 }: {
   file: FileSystemFileItem | null
   url: string | null
@@ -253,6 +267,13 @@ export function FileViewerDialog({
   onOpenChangeAction: (open: boolean) => void
   isStarred?: boolean
   onToggleStarAction?: () => void
+  /** Set together to step through a media sequence. Omitted elsewhere. */
+  hasPrevious?: boolean
+  hasNext?: boolean
+  onPreviousAction?: () => void
+  onNextAction?: () => void
+  /** True while the next item's URL is still resolving. */
+  loading?: boolean
   /** Omitted for read-only buckets, which hides the edit control. */
   onSaveAction?: (
     file: FileSystemFileItem,
@@ -307,25 +328,28 @@ export function FileViewerDialog({
   // centered below it.
   const isMedia = kind === "image" || kind === "video" || kind === "audio"
 
-  const body = url ? (
-    <ViewerBody
-      kind={kind}
-      fileName={fileName}
-      url={url}
-      codeViewerRef={codeViewerRef}
-      editing={editing}
-      onSaveAction={
-        onSaveAction && file
-          ? (text, contentType) => onSaveAction(file, text, contentType)
-          : undefined
-      }
-      onStatusChangeAction={setStatus}
-    />
-  ) : (
-    <div className="flex h-full items-center justify-center p-8 text-center text-sm text-muted-foreground">
-      {t("noUrl")}
-    </div>
-  )
+  const body =
+    loading && !url ? (
+      <ViewerFallback />
+    ) : url ? (
+      <ViewerBody
+        kind={kind}
+        fileName={fileName}
+        url={url}
+        codeViewerRef={codeViewerRef}
+        editing={editing}
+        onSaveAction={
+          onSaveAction && file
+            ? (text, contentType) => onSaveAction(file, text, contentType)
+            : undefined
+        }
+        onStatusChangeAction={setStatus}
+      />
+    ) : (
+      <div className="flex h-full items-center justify-center p-8 text-center text-sm text-muted-foreground">
+        {t("noUrl")}
+      </div>
+    )
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -396,6 +420,30 @@ export function FileViewerDialog({
                         className="size-5 sm:size-4.5"
                       />
                     </Button>
+                  ) : null}
+                  {onPreviousAction || onNextAction ? (
+                    <>
+                      <Button
+                        aria-label={t("previous")}
+                        title={t("previous")}
+                        size="icon-sm"
+                        variant="ghost"
+                        disabled={!hasPrevious}
+                        onClick={onPreviousAction}
+                      >
+                        <AppIcon icon={ArrowLeft01Icon} />
+                      </Button>
+                      <Button
+                        aria-label={t("next")}
+                        title={t("next")}
+                        size="icon-sm"
+                        variant="ghost"
+                        disabled={!hasNext}
+                        onClick={onNextAction}
+                      >
+                        <AppIcon icon={ArrowRight01Icon} />
+                      </Button>
+                    </>
                   ) : null}
                   {onToggleStarAction ? (
                     <StarButton

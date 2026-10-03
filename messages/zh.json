@@ -363,7 +363,9 @@
     "sortAscending": "升序排序",
     "sortDescending": "降序排序",
     "clear": "清除",
-    "unknownAuthor": "未知作者"
+    "unknownAuthor": "未知作者",
+    "previous": "上一个",
+    "next": "下一个"
   },
   "Media": {
     "title": "媒体",
@@ -380,6 +382,7 @@
     "loadingMore": "正在加载更多…",
     "loadError": "无法加载媒体",
     "emptyTitle": "没有照片或视频",
-    "emptyDescription": "这个存储桶里还没有图片或视频。"
+    "emptyDescription": "这个存储桶里还没有图片或视频。",
+    "dayCount": "{count} 项"
   }
 }

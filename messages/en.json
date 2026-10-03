@@ -363,7 +363,9 @@
     "sortAscending": "Sort ascending",
     "sortDescending": "Sort descending",
     "clear": "Clear",
-    "unknownAuthor": "Unknown author"
+    "unknownAuthor": "Unknown author",
+    "previous": "Previous",
+    "next": "Next"
   },
   "Media": {
     "title": "Media",
@@ -380,6 +382,7 @@
     "loadingMore": "Loading more…",
     "loadError": "Couldn't load media",
     "emptyTitle": "No photos or videos",
-    "emptyDescription": "This bucket has no images or videos yet."
+    "emptyDescription": "This bucket has no images or videos yet.",
+    "dayCount": "{count, plural, one {# item} other {# items}}"
   }
 }

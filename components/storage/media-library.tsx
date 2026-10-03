@@ -17,6 +17,7 @@ import { ImageThumbnailPreview } from "@/components/explorer/image-thumbnail-pre
 import type { FileSystemFileItem } from "@/components/explorer/types"
 import { AppIcon, Image01Icon, PlayIcon } from "@/components/foundations/icons"
 import { NEUTRAL_BADGE_CLASSNAME } from "@/components/storage/badge-styles"
+import { FileViewerDialog } from "@/components/storage/file-viewer-dialog"
 import { listMediaAction, mediaSummaryAction } from "@/app/actions/files"
 
 type MediaLibraryProps = {
@@ -26,6 +27,8 @@ type MediaLibraryProps = {
   thumbnailHandle?: string | null
   getFileUrl?: (file: FileSystemFileItem) => Promise<string>
   onOpenAction?: (file: FileSystemFileItem, url: string | null) => void
+  isStarredAction?: (key: string) => boolean
+  onToggleStarAction?: (file: FileSystemFileItem) => void
   initialMedia?: MediaBootstrap | null
 }
 
@@ -66,10 +69,15 @@ function startOfDay(date: Date): number {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime()
 }
 
+function formatDuration(seconds: number): string {
+  const total = Math.max(0, Math.round(seconds))
+  const minutes = Math.floor(total / 60)
+  const rest = total % 60
+  return `${minutes}:${rest.toString().padStart(2, "0")}`
+}
+
 function ContentsChart({ summary }: { summary: MediaSummary }) {
   const t = useTranslations("Media")
-  const locale = useLocale()
-  const dateLocale = locale === "zh" ? "zh-CN" : "en-US"
   const rows = [
     {
       key: "image" as const,
@@ -137,6 +145,8 @@ export function MediaLibrary({
   thumbnailHandle,
   getFileUrl,
   onOpenAction,
+  isStarredAction,
+  onToggleStarAction,
   initialMedia = null,
 }: MediaLibraryProps) {
   const t = useTranslations("Media")
@@ -161,6 +171,11 @@ export function MediaLibrary({
   const scrollerRef = React.useRef<HTMLDivElement>(null)
   const sentinelRef = React.useRef<HTMLDivElement>(null)
   const urlCache = React.useMemo(() => new Map<string, string>(), [])
+  const [columns, setColumns] = React.useState(4)
+  const [viewerIndex, setViewerIndex] = React.useState<number | null>(null)
+  const [viewerUrl, setViewerUrl] = React.useState<string | null>(null)
+  const [viewerLoading, setViewerLoading] = React.useState(false)
+  const viewerRequest = React.useRef(0)
 
   React.useEffect(() => {
     if (!connection) return
@@ -264,17 +279,50 @@ export function MediaLibrary({
     [dateLocale, t]
   )
 
-  const openItem = (item: MediaListItem) => {
-    if (!onOpenAction) return
-    const file = toFile(item)
-    if (!getFileUrl) {
-      onOpenAction(file, null)
-      return
+  React.useEffect(() => {
+    const node = scrollerRef.current
+    if (!node) return
+    const measure = () => {
+      const styles = getComputedStyle(node)
+      const pad =
+        Number.parseFloat(styles.paddingLeft) +
+        Number.parseFloat(styles.paddingRight)
+      const width = Math.max(0, node.clientWidth - pad)
+      const tile = 148
+      const gap = 2
+      setColumns(Math.max(2, Math.floor((width + gap) / (tile + gap))))
     }
-    void getFileUrl(file)
-      .then((url) => onOpenAction(file, url))
-      .catch(() => onOpenAction(file, null))
-  }
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [])
+
+  const openAt = React.useCallback(
+    (index: number) => {
+      const item = items[index]
+      if (!item) return
+      const request = ++viewerRequest.current
+      const file = toFile(item)
+      setViewerIndex(index)
+      setViewerUrl(null)
+      setViewerLoading(true)
+      onOpenAction?.(file, null)
+      const finish = (url: string | null) => {
+        if (viewerRequest.current !== request) return
+        setViewerUrl(url)
+        setViewerLoading(false)
+      }
+      if (!getFileUrl) {
+        finish(null)
+        return
+      }
+      void getFileUrl(file).then(finish, () => finish(null))
+    },
+    [getFileUrl, items, onOpenAction]
+  )
+
+  const viewerItem = viewerIndex !== null ? items[viewerIndex] : null
 
   const titleName = connection?.name ?? connectionName
 
@@ -318,45 +366,64 @@ export function MediaLibrary({
             </div>
           </div>
         ) : (
-          <div className="space-y-6 p-3" data-media-count={items.length}>
+          <div className="space-y-5 px-2 py-1" data-media-count={items.length}>
             {groups.map((group) => (
               <section key={group.key}>
-                <h3 className="mb-2 px-1 text-sm font-medium">
-                  {labelFor(group.items[0]?.updatedAt)}
-                </h3>
-                <div className="grid grid-cols-[repeat(auto-fill,minmax(8.75rem,1fr))] gap-1">
-                  {group.items.map((item) => (
-                    <button
-                      key={item.key}
-                      type="button"
-                      data-media-key={item.key}
-                      onClick={() => openItem(item)}
-                      className="group relative aspect-square overflow-hidden rounded-md bg-muted text-start outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    >
-                      {item.kind === "image" && getFileUrl ? (
-                        <ImageThumbnailPreview
-                          cacheKey={`${connection?.id ?? ""}\u0000${item.path}`}
-                          file={toFile(item)}
-                          getFileUrl={getFileUrl}
-                          urlCache={urlCache}
-                          thumbnailHandle={thumbnailHandle}
-                          widthHint={160}
-                        />
-                      ) : (
-                        <span className="flex size-full items-center justify-center bg-neutral-900 text-white">
-                          {item.kind === "video" ? (
-                            <AppIcon
-                              icon={PlayIcon}
-                              className="size-8 fill-current"
-                              aria-hidden
-                            />
-                          ) : null}
-                          <span className="sr-only">{t("play")}</span>
-                        </span>
-                      )}
-                      <span className="sr-only">{item.name}</span>
-                    </button>
-                  ))}
+                <div className="sticky top-0 z-10 flex items-baseline justify-between gap-3 bg-background/95 px-1 py-2 backdrop-blur-sm">
+                  <h3 className="text-sm font-semibold tracking-tight">
+                    {labelFor(group.items[0]?.updatedAt)}
+                  </h3>
+                  <span className="shrink-0 text-xs text-muted-foreground">
+                    {t("dayCount", { count: group.items.length })}
+                  </span>
+                </div>
+                <div
+                  className="grid gap-0.5"
+                  style={{
+                    gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+                  }}
+                >
+                  {group.items.map((item) => {
+                    const index = items.indexOf(item)
+                    return (
+                      <button
+                        key={item.key}
+                        type="button"
+                        data-media-key={item.key}
+                        data-media-kind={item.kind}
+                        onClick={() => openAt(index)}
+                        className="relative aspect-square overflow-hidden bg-muted text-start outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+                      >
+                        {item.kind === "image" && getFileUrl ? (
+                          <ImageThumbnailPreview
+                            cacheKey={`${connection?.id ?? ""}\u0000${item.path}`}
+                            file={toFile(item)}
+                            getFileUrl={getFileUrl}
+                            urlCache={urlCache}
+                            thumbnailHandle={thumbnailHandle}
+                            widthHint={160}
+                          />
+                        ) : (
+                          <span className="flex size-full items-center justify-center bg-neutral-950 text-white">
+                            <span className="flex size-9 items-center justify-center rounded-full bg-white/15">
+                              <AppIcon
+                                icon={PlayIcon}
+                                className="size-5 fill-current"
+                                aria-hidden
+                              />
+                            </span>
+                            <span className="sr-only">{t("play")}</span>
+                          </span>
+                        )}
+                        {item.kind === "video" && item.durationSeconds ? (
+                          <span className="pointer-events-none absolute right-1 bottom-1 rounded bg-black/75 px-1 py-0.5 text-[11px] font-medium text-white tabular-nums">
+                            {formatDuration(item.durationSeconds)}
+                          </span>
+                        ) : null}
+                        <span className="sr-only">{item.name}</span>
+                      </button>
+                    )
+                  })}
                 </div>
               </section>
             ))}
@@ -372,6 +439,36 @@ export function MediaLibrary({
           </div>
         )}
       </div>
+      <FileViewerDialog
+        file={viewerItem ? toFile(viewerItem) : null}
+        url={viewerUrl}
+        loading={viewerLoading}
+        open={viewerIndex !== null}
+        onOpenChangeAction={(next) => {
+          if (!next) {
+            viewerRequest.current += 1
+            setViewerIndex(null)
+            setViewerUrl(null)
+            setViewerLoading(false)
+          }
+        }}
+        hasPrevious={viewerIndex !== null && viewerIndex > 0}
+        hasNext={viewerIndex !== null && viewerIndex < items.length - 1}
+        onPreviousAction={
+          viewerIndex !== null ? () => openAt(viewerIndex - 1) : undefined
+        }
+        onNextAction={
+          viewerIndex !== null ? () => openAt(viewerIndex + 1) : undefined
+        }
+        isStarred={
+          viewerItem ? (isStarredAction?.(viewerItem.key) ?? false) : false
+        }
+        onToggleStarAction={
+          viewerItem && onToggleStarAction
+            ? () => onToggleStarAction(toFile(viewerItem))
+            : undefined
+        }
+      />
     </div>
   )
 }

@@ -5,7 +5,7 @@ import type { StoredFile } from "files-sdk"
 import { MOCK_CONNECTION_ID } from "@/lib/storage/connections"
 import type { FilesClient } from "@/lib/storage/files-client"
 import { MOCK_SEEDS, type MockSeed } from "@/lib/storage/mock-catalog"
-import { MOCK_CLIP_MP4_BASE64 } from "@/lib/storage/mock-clip"
+import { MOCK_CLIPS_BASE64 } from "@/lib/storage/mock-clip"
 import { mockPng } from "@/lib/storage/mock-png"
 
 /**
@@ -19,8 +19,19 @@ export function isStorageMockEnabled(): boolean {
 }
 
 const textEncoder = new TextEncoder()
-const clipBytes = Uint8Array.from(Buffer.from(MOCK_CLIP_MP4_BASE64, "base64"))
+const clipCache = new Map<string, Uint8Array>()
 const pngCache = new Map<string, Uint8Array>()
+
+function clipFor(key: string): Uint8Array {
+  const cached = clipCache.get(key)
+  if (cached) return cached
+  const name = key.slice(key.lastIndexOf("/") + 1).replace(/\.mp4$/, "")
+  const encoded = MOCK_CLIPS_BASE64[name] ?? Object.values(MOCK_CLIPS_BASE64)[0]
+  if (!encoded) return new Uint8Array()
+  const bytes = Uint8Array.from(Buffer.from(encoded, "base64"))
+  clipCache.set(key, bytes)
+  return bytes
+}
 
 function etagFor(key: string): string {
   let hash = 2166136261
@@ -39,7 +50,7 @@ function bodyFor(seed: MockSeed): Uint8Array {
     pngCache.set(seed.key, png)
     return png
   }
-  if (seed.contentType.startsWith("video/")) return clipBytes
+  if (seed.contentType.startsWith("video/")) return clipFor(seed.key)
   if (seed.key.endsWith(".txt")) {
     return textEncoder.encode("Mock captions for the media library.\n")
   }
@@ -89,6 +100,9 @@ function listed(seed: MockSeed): StoredFile {
     lastModified: Date.parse(seed.updatedAt),
     key: seed.key,
     etag: etagFor(seed.key),
+    metadata: seed.durationSeconds
+      ? { duration: String(seed.durationSeconds) }
+      : undefined,
     arrayBuffer: async () => arrayBufferOf(bytes()),
     text: async () => new TextDecoder().decode(bytes()),
     stream: () => new Blob([bytes().slice()]).stream(),

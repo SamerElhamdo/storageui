@@ -93,6 +93,7 @@ async function scan(ref: ConnectionRef): Promise<MediaIndex> {
       summary[group].count += 1
       summary[group].bytes += size
       if (group === "other") continue
+      const duration = Number(file.metadata?.duration)
       media.push({
         path: item.path,
         key: file.key,
@@ -102,6 +103,8 @@ async function scan(ref: ConnectionRef): Promise<MediaIndex> {
         updatedAt: item.updatedAt,
         etag: item.etag,
         kind: group,
+        durationSeconds:
+          Number.isFinite(duration) && duration > 0 ? duration : undefined,
       })
     }
   } catch (error) {
