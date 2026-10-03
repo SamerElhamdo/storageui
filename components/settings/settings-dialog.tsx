@@ -20,16 +20,16 @@ import {
   DialogHeader,
   DialogPanel,
   DialogTitle,
-} from "@/components/ui/dialog"
+} from "@heroui/react"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@heroui/react"
 import { Switch } from "@/components/ui/switch"
-import { Tabs, TabsList, TabsPanel, TabsTab } from "@/components/ui/tabs"
+import { Tabs, TabsList, TabsPanel, TabsTab } from "@heroui/react"
 import { AppIcon, ExternalLinkIcon } from "@/components/foundations/icons"
 import { Logo } from "@/components/foundations/logo"
 import { setLocale } from "@/app/actions/locale"
@@ -96,15 +96,15 @@ export function SettingsDialog({
     })
   }
   return (
-    <Dialog open={open} onOpenChange={onOpenChangeAction}>
+    <Modal open={open} onOpenChange={onOpenChangeAction}>
       {open ? (
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>{t("title")}</DialogTitle>
-            <DialogDescription>{t("description")}</DialogDescription>
-          </DialogHeader>
+        <ModalContent className="max-w-2xl">
+          <ModalHeader>
+            <ModalTitle>{t("title")}</ModalTitle>
+            <ModalDescription>{t("description")}</ModalDescription>
+          </ModalHeader>
 
-          <DialogPanel className="pt-2">
+          <ModalPanel className="pt-2">
             <Tabs
               className="h-80 w-full gap-5"
               defaultValue="general"
@@ -337,9 +337,9 @@ export function SettingsDialog({
                 </dl>
               </TabsPanel>
             </Tabs>
-          </DialogPanel>
-        </DialogContent>
+          </ModalPanel>
+        </ModalContent>
       ) : null}
-    </Dialog>
+    </Modal>
   )
 }

@@ -10,7 +10,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
+} from "@heroui/react"
 import { AppIcon, Search01Icon } from "@/components/foundations/icons"
 
 function Command({
@@ -44,20 +44,20 @@ function CommandDialog({
   children?: React.ReactNode
 }) {
   return (
-    <Dialog {...props}>
-      <DialogHeader className="sr-only">
-        <DialogTitle>{title}</DialogTitle>
-        <DialogDescription>{description}</DialogDescription>
-      </DialogHeader>
-      <DialogContent
+    <Modal {...props}>
+      <ModalHeader className="sr-only">
+        <ModalTitle>{title}</ModalTitle>
+        <ModalDescription>{description}</ModalDescription>
+      </ModalHeader>
+      <ModalContent
         className={cn("overflow-hidden p-0", className)}
         showCloseButton={showCloseButton}
       >
         <Command className="**:data-[slot=command-input-wrapper]:h-12 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]]:px-2 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:size-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:size-5">
           {children}
         </Command>
-      </DialogContent>
-    </Dialog>
+      </ModalContent>
+    </Modal>
   )
 }
 

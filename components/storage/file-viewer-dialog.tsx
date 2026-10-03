@@ -6,7 +6,7 @@ import { useTheme } from "next-themes"
 
 import { getFileKind, type FileKind } from "@/lib/file-kind"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { Button } from "@heroui/react"
 import {
   Dialog,
   DialogClose,
@@ -15,8 +15,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Spinner } from "@/components/ui/spinner"
+} from "@heroui/react"
+import { Spinner } from "@heroui/react"
 import type { FileSystemFileItem } from "@/components/explorer/types"
 import {
   AppIcon,
@@ -328,13 +328,13 @@ export function FileViewerDialog({
   )
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
+    <Modal open={open} onOpenChange={handleOpenChange}>
       {open && file ? (
-        <DialogContent
+        <ModalContent
           showCloseButton={kind === "other"}
           className={cn("overflow-hidden", DIALOG_CLASSNAMES[kind])}
         >
-          <DialogTitle className="sr-only">{fileName}</DialogTitle>
+          <ModalTitle className="sr-only">{fileName}</ModalTitle>
           {kind === "other" ? (
             body
           ) : (
@@ -425,12 +425,12 @@ export function FileViewerDialog({
                       <AppIcon icon={Download01Icon} />
                     </Button>
                   ) : null}
-                  <DialogClose
+                  <ModalClose
                     aria-label={t("close")}
                     render={<Button size="icon" variant="ghost" />}
                   >
                     <AppIcon icon={Cancel01Icon} />
-                  </DialogClose>
+                  </ModalClose>
                 </div>
               </div>
               <div
@@ -444,20 +444,20 @@ export function FileViewerDialog({
               </div>
             </div>
           )}
-          <Dialog
+          <Modal
             open={pendingDiscard !== null}
             onOpenChange={(next) => {
               if (!next) setPendingDiscard(null)
             }}
           >
-            <DialogContent className="max-w-sm">
-              <DialogHeader>
-                <DialogTitle>{t("discardTitle")}</DialogTitle>
-                <DialogDescription>
+            <ModalContent className="max-w-sm">
+              <ModalHeader>
+                <ModalTitle>{t("discardTitle")}</ModalTitle>
+                <ModalDescription>
                   {t("discardDescription", { name: fileName })}
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter>
+                </ModalDescription>
+              </ModalHeader>
+              <ModalFooter>
                 <Button
                   variant="outline"
                   onClick={() => setPendingDiscard(null)}
@@ -467,11 +467,11 @@ export function FileViewerDialog({
                 <Button variant="destructive" onClick={discard}>
                   {t("discard")}
                 </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </DialogContent>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
+        </ModalContent>
       ) : null}
-    </Dialog>
+    </Modal>
   )
 }

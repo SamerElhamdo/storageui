@@ -7,19 +7,19 @@ import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
 import { useMediaQuery } from "@/hooks/use-media-query"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Button } from "@heroui/react"
+import { Input } from "@heroui/react"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Separator } from "@/components/ui/separator"
+import { Separator } from "@heroui/react"
 import {
   Sheet,
   SheetDescription,
   SheetHeader,
   SheetPopup,
   SheetTitle,
-} from "@/components/ui/sheet"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Tooltip, TooltipPopup, TooltipTrigger } from "@/components/ui/tooltip"
+} from "@heroui/react"
+import { Skeleton } from "@heroui/react"
+import { Tooltip, TooltipPopup, TooltipTrigger } from "@heroui/react"
 import { AppIcon, SidebarLeftIcon } from "@/components/foundations/icons"
 
 const SIDEBAR_COOKIE_NAME: string = "sidebar_state"

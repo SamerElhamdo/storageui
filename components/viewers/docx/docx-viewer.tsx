@@ -16,16 +16,16 @@ import { useVirtualizer } from "@tanstack/react-virtual"
 import { useTranslations } from "next-intl"
 
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { Button } from "@heroui/react"
 import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
+  Dropdown,
+  DropdownCheckboxItem,
+  DropdownContent,
+  DropdownItem,
+  DropdownSeparator,
+  DropdownTrigger,
+} from "@heroui/react"
+import { Input } from "@heroui/react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import {
   Select,
@@ -33,15 +33,20 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Separator } from "@/components/ui/separator"
-import { Spinner } from "@/components/ui/spinner"
+} from "@heroui/react"
+import { Separator } from "@heroui/react"
+import { Spinner } from "@heroui/react"
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
+import {
+  Tooltip,
+  TooltipContent,
   TooltipTrigger,
-} from "@/components/ui/tooltip"
+} from "@heroui/react"
+import { TooltipProvider } from "@/components/ui/tooltip"
+  TooltipTrigger,
+} from "@heroui/react"
 import { FileThumbnail } from "@/components/explorer/file-thumbnail"
 import {
   AppIcon,
@@ -353,8 +358,8 @@ function DocxFileActionsMenu({
   const showFileActions = showDownloadButton || showUploadButton
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+    <Dropdown>
+      <DropdownTrigger asChild>
         <Button
           type="button"
           variant="ghost"
@@ -363,11 +368,11 @@ function DocxFileActionsMenu({
         >
           <AppIcon icon={MoreHorizontalIcon} className="size-4" />
         </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-52">
+      </DropdownTrigger>
+      <DropdownContent align="end" className="w-52">
         {showNightRenderToggle ? (
           <>
-            <DropdownMenuCheckboxItem
+            <DropdownCheckboxItem
               checked={isDark}
               disabled={controlsDisabled}
               variant="switch"
@@ -377,11 +382,11 @@ function DocxFileActionsMenu({
                 <AppIcon icon={Moon02Icon} className="size-4" />
                 {t("darkMode")}
               </span>
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuSeparator />
+            </DropdownCheckboxItem>
+            <DropdownSeparator />
           </>
         ) : null}
-        <DropdownMenuCheckboxItem
+        <DropdownCheckboxItem
           checked={showDocumentMarkup}
           disabled={controlsDisabled}
           variant="switch"
@@ -393,26 +398,26 @@ function DocxFileActionsMenu({
             <AppIcon icon={Comment01Icon} className="size-4" />
             {t("commentsEdits")}
           </span>
-        </DropdownMenuCheckboxItem>
-        {showFileActions ? <DropdownMenuSeparator /> : null}
+        </DropdownCheckboxItem>
+        {showFileActions ? <DropdownSeparator /> : null}
         {showDownloadButton ? (
-          <DropdownMenuItem disabled={downloadDisabled} onClick={onDownload}>
+          <DropdownItem disabled={downloadDisabled} onClick={onDownload}>
             {isPreparingDownload ? (
               <Spinner className="size-4" />
             ) : (
               <AppIcon icon={Download01Icon} className="size-4" />
             )}
             {t("download")}
-          </DropdownMenuItem>
+          </DropdownItem>
         ) : null}
         {showUploadButton ? (
-          <DropdownMenuItem onClick={onUploadClick}>
+          <DropdownItem onClick={onUploadClick}>
             <AppIcon icon={Upload01Icon} className="size-4" />
             {t("upload")}
-          </DropdownMenuItem>
+          </DropdownItem>
         ) : null}
-      </DropdownMenuContent>
-    </DropdownMenu>
+      </DropdownContent>
+    </Dropdown>
   )
 }
 

@@ -4,7 +4,7 @@ import * as React from "react"
 import { useLocale, useTranslations } from "next-intl"
 
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { Button } from "@heroui/react"
 import {
   Dialog,
   DialogContent,
@@ -12,8 +12,8 @@ import {
   DialogHeader,
   DialogPanel,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
+} from "@heroui/react"
+import { Input } from "@heroui/react"
 import {
   AppIcon,
   ArrowLeft01Icon,
@@ -313,17 +313,17 @@ export function FileSystemDateRangeDialog({
   )
 
   return (
-    <Dialog
+    <Modal
       open
       onOpenChange={(open) => {
         if (!open) onCloseAction()
       }}
     >
-      <DialogContent className="w-120 max-w-[calc(100vw-2rem)]">
-        <DialogHeader>
-          <DialogTitle>{t("dateRangeTitle")}</DialogTitle>
-        </DialogHeader>
-        <DialogPanel className="flex flex-col gap-4">
+      <ModalContent className="w-120 max-w-[calc(100vw-2rem)]">
+        <ModalHeader>
+          <ModalTitle>{t("dateRangeTitle")}</ModalTitle>
+        </ModalHeader>
+        <ModalPanel className="flex flex-col gap-4">
           <div className="flex gap-3">
             {dateField(t("from"), fromInput, (value) => {
               setFromInput(value)
@@ -355,8 +355,8 @@ export function FileSystemDateRangeDialog({
               </Button>
             ))}
           </div>
-        </DialogPanel>
-        <DialogFooter>
+        </ModalPanel>
+        <ModalFooter>
           <Button type="button" variant="outline" onClick={onCloseAction}>
             {tc("cancel")}
           </Button>
@@ -376,8 +376,8 @@ export function FileSystemDateRangeDialog({
           >
             {tc("apply")}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
   )
 }

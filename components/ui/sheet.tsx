@@ -7,7 +7,7 @@ import { mergeProps } from "@base-ui/react/merge-props"
 import { useRender } from "@base-ui/react/use-render"
 
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { Button } from "@heroui/react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { AppIcon, Cancel01Icon } from "@/components/foundations/icons"
 

@@ -6,7 +6,7 @@ import { toast } from "sonner"
 import { Chip, Kbd, Toolbar, Dropdown, Form } from "@heroui/react"
 
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { Button } from "@heroui/react"
 import {
   Command,
   CommandEmpty,
@@ -27,7 +27,7 @@ import {
   DialogClose,
   DialogContent,
   DialogTitle,
-} from "@/components/ui/dialog"
+} from "@heroui/react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,12 +36,12 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@heroui/react"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@heroui/react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import {
   Select,
@@ -49,7 +49,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@heroui/react"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { FileSystemDateRangeDialog } from "@/components/explorer/dialogs/date-range-dialog"
 import {
@@ -1908,12 +1908,12 @@ export function FileSystem({
     : ""
   const activeViewOption = VIEW_OPTIONS.find((option) => option.value === view)
   const viewerCloseToolbarAction = (
-    <DialogClose
+    <ModalClose
       aria-label={t("closePreview")}
       render={<Button type="button" variant="ghost" size="icon-sm" />}
     >
       <AppIcon icon={Cancel01Icon} className="size-4" />
-    </DialogClose>
+    </ModalClose>
   )
 
   return (
@@ -2495,21 +2495,21 @@ export function FileSystem({
             }}
             onSubmitAction={() => void confirmDeleteEntry()}
           />
-          <Dialog
+          <Modal
             open={openedFile !== null}
             onOpenChange={(open) => {
               if (!open) setOpenedFile(null)
             }}
           >
             {openedFile ? (
-              <DialogContent
+              <ModalContent
                 className={cn(
                   "overflow-hidden p-0",
                   VIEWER_DIALOG_CLASSNAMES[openedFile.kind]
                 )}
                 showCloseButton={openedFile.kind === "image"}
               >
-                <DialogTitle className="sr-only">{openedFileName}</DialogTitle>
+                <ModalTitle className="sr-only">{openedFileName}</ModalTitle>
                 {openedFile.kind === "image" ? (
                   <img
                     src={openedFile.url}
@@ -2526,9 +2526,9 @@ export function FileSystem({
                     className="flex h-full min-h-0 flex-1 flex-col"
                   />
                 )}
-              </DialogContent>
+              </ModalContent>
             ) : null}
-            {/* The pooled previews. Rendered inside <Dialog> so the dialog
+            {/* The pooled previews. Rendered inside <Modal> so the dialog
             variant's close toolbar button keeps its context; each portal's
             container never changes, the container's parent does. */}
             {stagePool.map((path) => {
@@ -2559,7 +2559,7 @@ export function FileSystem({
                 path
               )
             })}
-          </Dialog>
+          </Modal>
           {dateRangeDialog ? (
             <FileSystemDateRangeDialog
               initialRange={dateRangeDialog.initialRange}
@@ -2845,8 +2845,8 @@ function FileSystemFilterMenu({
   const fileTypeFilter = filters.find((filter) => filter.type === "fileType")
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
+    <Dropdown>
+      <DropdownTrigger
         render={
           <Button
             type="button"
@@ -2862,52 +2862,52 @@ function FileSystemFilterMenu({
         {filters.length > 0 ? (
           <span className="absolute top-1 right-1 size-1.5 rounded-full bg-primary" />
         ) : null}
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="min-w-44">
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger>
+      </DropdownTrigger>
+      <DropdownContent align="end" className="min-w-44">
+        <DropdownSub>
+          <DropdownSubTrigger>
             <AppIcon
               icon={File01Icon}
               className="size-4 text-muted-foreground"
             />
             {t("filterFileType")}
-          </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent className="w-60">
+          </DropdownSubTrigger>
+          <DropdownSubContent className="w-60">
             <FileSystemFileTypeCommand
               checkedMimes={fileTypeFilter?.value ?? []}
               onToggle={onToggleFileType}
               options={fileTypeOptions}
             />
-          </DropdownMenuSubContent>
-        </DropdownMenuSub>
+          </DropdownSubContent>
+        </DropdownSub>
         {(["dateModified", "dateCreated"] as const).map((type) => (
-          <DropdownMenuSub key={type}>
-            <DropdownMenuSubTrigger>
+          <DropdownSub key={type}>
+            <DropdownSubTrigger>
               <AppIcon
                 icon={Calendar03Icon}
                 className="size-4 text-muted-foreground"
               />
               {t(FILTER_TYPE_KEYS[type])}
-            </DropdownMenuSubTrigger>
-            <DropdownMenuSubContent>
+            </DropdownSubTrigger>
+            <DropdownSubContent>
               <ScrollArea orientation="vertical" className="h-auto max-h-72">
                 {DATE_FILTER_PRESETS.map((preset) => (
-                  <DropdownMenuItem
+                  <DropdownItem
                     key={preset}
                     onClick={() => onSelectDatePreset(type, preset)}
                   >
                     {t(DATE_PRESET_KEYS[preset])}
-                  </DropdownMenuItem>
+                  </DropdownItem>
                 ))}
-                <DropdownMenuItem onClick={() => onOpenCustomRange(type)}>
+                <DropdownItem onClick={() => onOpenCustomRange(type)}>
                   {t("customRange")}
-                </DropdownMenuItem>
+                </DropdownItem>
               </ScrollArea>
-            </DropdownMenuSubContent>
-          </DropdownMenuSub>
+            </DropdownSubContent>
+          </DropdownSub>
         ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+      </DropdownContent>
+    </Dropdown>
   )
 }
 
@@ -2965,8 +2965,8 @@ function FileSystemFilterPill({
         />
         {t(FILTER_TYPE_KEYS[filter.type])}
       </span>
-      <DropdownMenu>
-        <DropdownMenuTrigger
+      <Dropdown>
+        <DropdownTrigger
           render={
             <button
               type="button"
@@ -2975,21 +2975,21 @@ function FileSystemFilterPill({
           }
         >
           {t(OPERATOR_KEYS[filter.operator])}
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="min-w-28">
+        </DropdownTrigger>
+        <DropdownContent align="start" className="min-w-28">
           {filterOperatorChoices(filter).map((operator) => (
-            <DropdownMenuItem
+            <DropdownItem
               key={operator}
               onClick={() => onOperatorChange(operator)}
             >
               {t(OPERATOR_KEYS[operator])}
-            </DropdownMenuItem>
+            </DropdownItem>
           ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
+        </DropdownContent>
+      </Dropdown>
       {filter.type === "fileType" ? (
-        <DropdownMenu>
-          <DropdownMenuTrigger
+        <Dropdown>
+          <DropdownTrigger
             render={
               <button
                 type="button"
@@ -3001,15 +3001,15 @@ function FileSystemFilterPill({
             {filter.value.length === 1
               ? selectedTypeLabels[0]
               : t("selectedCount", { count: filter.value.length })}
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-60">
+          </DropdownTrigger>
+          <DropdownContent align="start" className="w-60">
             <FileSystemFileTypeCommand
               checkedMimes={filter.value}
               onToggle={onToggleFileType}
               options={fileTypeOptions}
             />
-          </DropdownMenuContent>
-        </DropdownMenu>
+          </DropdownContent>
+        </Dropdown>
       ) : isCustomRange ? (
         <button
           type="button"
@@ -3021,8 +3021,8 @@ function FileSystemFilterPill({
             .join(" – ")}
         </button>
       ) : (
-        <DropdownMenu>
-          <DropdownMenuTrigger
+        <Dropdown>
+          <DropdownTrigger
             render={
               <button type="button" className={FILTER_PILL_BUTTON_CLASSNAME} />
             }
@@ -3030,23 +3030,23 @@ function FileSystemFilterPill({
             {DATE_PRESET_KEYS[filter.value[0]]
               ? t(DATE_PRESET_KEYS[filter.value[0]])
               : filter.value[0]}
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start">
+          </DropdownTrigger>
+          <DropdownContent align="start">
             <ScrollArea orientation="vertical" className="h-auto max-h-72">
               {DATE_FILTER_PRESETS.map((preset) => (
-                <DropdownMenuItem
+                <DropdownItem
                   key={preset}
                   onClick={() => onSelectDatePreset(preset)}
                 >
                   {t(DATE_PRESET_KEYS[preset])}
-                </DropdownMenuItem>
+                </DropdownItem>
               ))}
-              <DropdownMenuItem onClick={onOpenCustomRange}>
+              <DropdownItem onClick={onOpenCustomRange}>
                 {t("customRange")}
-              </DropdownMenuItem>
+              </DropdownItem>
             </ScrollArea>
-          </DropdownMenuContent>
-        </DropdownMenu>
+          </DropdownContent>
+        </Dropdown>
       )}
       <button
         type="button"

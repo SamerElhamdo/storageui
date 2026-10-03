@@ -7,7 +7,7 @@ import { mergeProps } from "@base-ui/react/merge-props"
 import { useRender } from "@base-ui/react/use-render"
 
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { Button } from "@heroui/react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { AppIcon, Cancel01Icon } from "@/components/foundations/icons"
 
@@ -28,7 +28,7 @@ export function DialogTrigger({
   asChild?: boolean
 }): React.ReactElement {
   return (
-    <DialogPrimitive.Trigger
+    <ModalPrimitive.Trigger
       data-slot="dialog-trigger"
       render={
         render ??
@@ -39,14 +39,14 @@ export function DialogTrigger({
       {...props}
     >
       {asChild && isValidElement(children) ? undefined : children}
-    </DialogPrimitive.Trigger>
+    </ModalPrimitive.Trigger>
   )
 }
 
 export function DialogClose(
   props: DialogPrimitive.Close.Props
 ): React.ReactElement {
-  return <DialogPrimitive.Close data-slot="dialog-close" {...props} />
+  return <ModalPrimitive.Close data-slot="dialog-close" {...props} />
 }
 
 export function DialogBackdrop({
@@ -54,7 +54,7 @@ export function DialogBackdrop({
   ...props
 }: DialogPrimitive.Backdrop.Props): React.ReactElement {
   return (
-    <DialogPrimitive.Backdrop
+    <ModalPrimitive.Backdrop
       className={cn(
         "fixed inset-0 z-50 bg-black/32 backdrop-blur-sm transition-all duration-200 data-ending-style:opacity-0 data-starting-style:opacity-0",
         className
@@ -70,7 +70,7 @@ export function DialogViewport({
   ...props
 }: DialogPrimitive.Viewport.Props): React.ReactElement {
   return (
-    <DialogPrimitive.Viewport
+    <ModalPrimitive.Viewport
       className={cn(
         "fixed inset-0 z-50 grid grid-rows-[1fr_auto_3fr] justify-items-center p-4",
         className
@@ -96,15 +96,15 @@ export function DialogPopup({
   portalProps?: DialogPrimitive.Portal.Props
 }): React.ReactElement {
   return (
-    <DialogPortal {...portalProps}>
-      <DialogBackdrop />
-      <DialogViewport
+    <ModalPortal {...portalProps}>
+      <ModalBackdrop />
+      <ModalViewport
         className={cn(
           bottomStickOnMobile &&
             "max-[800px]:grid-rows-[1fr_auto] max-[800px]:p-0 max-[800px]:pt-12"
         )}
       >
-        <DialogPrimitive.Popup
+        <ModalPrimitive.Popup
           className={cn(
             "relative row-start-2 flex max-h-full min-h-0 w-full max-w-lg min-w-0 origin-center flex-col rounded-2xl border bg-popover text-popover-foreground opacity-[calc(1-var(--nested-dialogs))] shadow-lg/5 transition-[scale,opacity,translate] duration-200 ease-in-out will-change-transform outline-none not-dark:bg-clip-padding before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-2xl)-1px)] before:shadow-[0_1px_--theme(--color-black/4%)] data-ending-style:opacity-0 data-starting-style:opacity-0 sm:scale-[calc(1-0.1*var(--nested-dialogs))] sm:data-ending-style:scale-98 sm:data-starting-style:scale-98 dark:before:shadow-[0_-1px_--theme(--color-white/6%)]",
             bottomStickOnMobile &&
@@ -116,18 +116,18 @@ export function DialogPopup({
         >
           {children}
           {showCloseButton && (
-            <DialogPrimitive.Close
+            <ModalPrimitive.Close
               aria-label="Close"
               className="absolute end-2 top-2"
               render={<Button size="icon" variant="ghost" />}
               {...closeProps}
             >
               <AppIcon icon={Cancel01Icon} />
-            </DialogPrimitive.Close>
+            </ModalPrimitive.Close>
           )}
-        </DialogPrimitive.Popup>
-      </DialogViewport>
-    </DialogPortal>
+        </ModalPrimitive.Popup>
+      </ModalViewport>
+    </ModalPortal>
   )
 }
 
@@ -182,7 +182,7 @@ export function DialogTitle({
   ...props
 }: DialogPrimitive.Title.Props): React.ReactElement {
   return (
-    <DialogPrimitive.Title
+    <ModalPrimitive.Title
       className={cn(
         "font-heading text-xl leading-none font-semibold",
         className
@@ -198,7 +198,7 @@ export function DialogDescription({
   ...props
 }: DialogPrimitive.Description.Props): React.ReactElement {
   return (
-    <DialogPrimitive.Description
+    <ModalPrimitive.Description
       className={cn("text-sm text-muted-foreground", className)}
       data-slot="dialog-description"
       {...props}

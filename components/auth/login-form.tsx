@@ -7,8 +7,8 @@ import { useTranslations } from "next-intl"
 import { useTheme } from "next-themes"
 
 import { siteConfig } from "@/lib/config/site"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Button } from "@heroui/react"
+import { Input } from "@heroui/react"
 import { Logo } from "@/components/foundations/logo"
 import { loginAction, type LoginState } from "@/app/actions/auth"
 

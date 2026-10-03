@@ -11,7 +11,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@heroui/react"
 import { setLocale } from "@/app/actions/locale"
 
 /** Language selector for the login page (no sidebar/settings available). */

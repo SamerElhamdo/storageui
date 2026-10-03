@@ -62,19 +62,20 @@ import { useTranslations } from "next-intl"
 import { flushSync } from "react-dom"
 
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { Button } from "@heroui/react"
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
+  Dropdown,
+  DropdownContent,
+  DropdownItem,
+  DropdownSeparator,
+  DropdownTrigger,
+} from "@heroui/react"
+import { Input } from "@heroui/react"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@heroui/react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import {
   Select,
@@ -82,15 +83,10 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Separator } from "@/components/ui/separator"
-import { Spinner } from "@/components/ui/spinner"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
+} from "@heroui/react"
+import { Separator } from "@heroui/react"
+import { Spinner } from "@heroui/react"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import {
   AppIcon,
   ArrowLeft01Icon,
@@ -580,8 +576,8 @@ function PDFViewerFileActionsMenu({
           }}
         />
       ) : null}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
+      <Dropdown>
+        <DropdownTrigger asChild>
           <Button
             type="button"
             variant="ghost"
@@ -590,26 +586,26 @@ function PDFViewerFileActionsMenu({
           >
             <AppIcon icon={MoreHorizontalIcon} className="size-4" />
           </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-40">
+        </DropdownTrigger>
+        <DropdownContent align="end" className="w-40">
           {showDownload && onDownload ? (
-            <DropdownMenuItem disabled={downloadDisabled} onClick={onDownload}>
+            <DropdownItem disabled={downloadDisabled} onClick={onDownload}>
               {isPreparingDownload ? (
                 <Spinner className="size-4" />
               ) : (
                 <AppIcon icon={Download01Icon} className="size-4" />
               )}
               {t("download")}
-            </DropdownMenuItem>
+            </DropdownItem>
           ) : null}
           {showUpload && onUploadFile ? (
-            <DropdownMenuItem onClick={() => inputRef.current?.click()}>
+            <DropdownItem onClick={() => inputRef.current?.click()}>
               <AppIcon icon={Upload01Icon} className="size-4" />
               {t("upload")}
-            </DropdownMenuItem>
+            </DropdownItem>
           ) : null}
-        </DropdownMenuContent>
-      </DropdownMenu>
+        </DropdownContent>
+      </Dropdown>
     </>
   )
 }

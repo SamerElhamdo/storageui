@@ -4,8 +4,8 @@ import * as React from "react"
 import { useTranslations } from "next-intl"
 
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Spinner } from "@/components/ui/spinner"
+import { Button } from "@heroui/react"
+import { Spinner } from "@heroui/react"
 import {
   AppIcon,
   MinusSignCircleIcon,

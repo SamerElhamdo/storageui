@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl"
 
 import type { TimeFormat } from "@/lib/store/preferences-store"
 import { cn } from "@/lib/utils"
-import { Spinner } from "@/components/ui/spinner"
+import { Spinner } from "@heroui/react"
 import { FileThumbnail } from "@/components/explorer/file-thumbnail"
 import type {
   FileEntry,

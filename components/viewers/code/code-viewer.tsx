@@ -22,7 +22,7 @@ import { useLocale, useTranslations } from "next-intl"
 import { useTheme } from "next-themes"
 import { toast } from "sonner"
 
-import { Spinner } from "@/components/ui/spinner"
+import { Spinner } from "@heroui/react"
 
 // CodeMirror's search/go-to-line panels are English by default; map the visible
 // phrases per locale via the `phrases` facet (keyed by the original English).

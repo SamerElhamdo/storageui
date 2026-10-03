@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl"
 import { usePreferencesStore } from "@/lib/store/preferences-store"
 import { cn } from "@/lib/utils"
 import { ScrollArea, ScrollAreaPrimitive } from "@/components/ui/scroll-area"
-import { Spinner } from "@/components/ui/spinner"
+import { Spinner } from "@heroui/react"
 import {
   fileKindLabel,
   filePreviewUrls,

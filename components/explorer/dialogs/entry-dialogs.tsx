@@ -3,11 +3,21 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { toast } from "sonner"
-import { Drawer, Form, Chip } from "@heroui/react"
+import {
+  Drawer,
+  DrawerBody,
+  DrawerCloseTrigger,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerHeading,
+  Form,
+  Chip,
+} from "@heroui/react"
 
 import { usePreferencesStore } from "@/lib/store/preferences-store"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { Button } from "@heroui/react"
 import {
   Dialog,
   DialogContent,
@@ -16,15 +26,15 @@ import {
   DialogHeader,
   DialogPanel,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
+} from "@heroui/react"
+import { Input } from "@heroui/react"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@heroui/react"
 import {
   FileSystemFolderGlyph,
   FileTypeIcon,
@@ -98,16 +108,16 @@ export function NewFolderDialog({
   const t = useTranslations("Dialogs")
   const tc = useTranslations("Common")
   return (
-    <Dialog open={open} onOpenChange={onOpenChangeAction}>
+    <Modal open={open} onOpenChange={onOpenChangeAction}>
       {open ? (
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle>{t("newFolderTitle")}</DialogTitle>
-            <DialogDescription>
+        <ModalContent className="max-w-sm">
+          <ModalHeader>
+            <ModalTitle>{t("newFolderTitle")}</ModalTitle>
+            <ModalDescription>
               {t("newFolderDescription", { folder: currentFolderName })}
-            </DialogDescription>
-          </DialogHeader>
-          <DialogPanel>
+            </ModalDescription>
+          </ModalHeader>
+          <ModalPanel>
             <Form
               id="new-folder-form"
               className="grid gap-2"
@@ -127,8 +137,8 @@ export function NewFolderDialog({
                 <p className="text-sm text-destructive">{error}</p>
               ) : null}
             </Form>
-          </DialogPanel>
-          <DialogFooter>
+          </ModalPanel>
+          <ModalFooter>
             <Button
               type="button"
               variant="outline"
@@ -145,10 +155,10 @@ export function NewFolderDialog({
             >
               {t("create")}
             </Button>
-          </DialogFooter>
-        </DialogContent>
+          </ModalFooter>
+        </ModalContent>
       ) : null}
-    </Dialog>
+    </Modal>
   )
 }
 
@@ -181,20 +191,20 @@ export function RenameEntryDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChangeAction}>
+    <Modal open={open} onOpenChange={onOpenChangeAction}>
       {entry ? (
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle>
+        <ModalContent className="max-w-sm">
+          <ModalHeader>
+            <ModalTitle>
               {entry.kind === "folder"
                 ? t("renameFolderTitle")
                 : t("renameFileTitle")}
-            </DialogTitle>
-            <DialogDescription>
+            </ModalTitle>
+            <ModalDescription>
               {t("renameDescription", { name: entry.name })}
-            </DialogDescription>
-          </DialogHeader>
-          <DialogPanel>
+            </ModalDescription>
+          </ModalHeader>
+          <ModalPanel>
             <Form
               id="rename-entry-form"
               className="grid gap-2"
@@ -216,8 +226,8 @@ export function RenameEntryDialog({
                 <p className="text-sm text-destructive">{error}</p>
               ) : null}
             </Form>
-          </DialogPanel>
-          <DialogFooter>
+          </ModalPanel>
+          <ModalFooter>
             <Button
               type="button"
               variant="outline"
@@ -234,10 +244,10 @@ export function RenameEntryDialog({
             >
               {t("rename")}
             </Button>
-          </DialogFooter>
-        </DialogContent>
+          </ModalFooter>
+        </ModalContent>
       ) : null}
-    </Dialog>
+    </Modal>
   )
 }
 
@@ -314,20 +324,20 @@ export function MoveEntriesDialog({
   const segments = pathSegments(navPath)
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChangeAction}>
+    <Modal open={open} onOpenChange={onOpenChangeAction}>
       {open ? (
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>
+        <ModalContent className="max-w-md">
+          <ModalHeader>
+            <ModalTitle>
               {targets.length > 1
                 ? t("moveItemsTitle", { count: targets.length })
                 : targets[0].kind === "folder"
                   ? t("moveFolderTitle")
                   : t("moveFileTitle")}
-            </DialogTitle>
-            <DialogDescription>{t("moveDescription")}</DialogDescription>
-          </DialogHeader>
-          <DialogPanel className="space-y-2">
+            </ModalTitle>
+            <ModalDescription>{t("moveDescription")}</ModalDescription>
+          </ModalHeader>
+          <ModalPanel className="space-y-2">
             {/* Breadcrumb of the browsing path. */}
             <div className="flex flex-wrap items-center gap-0.5 text-sm">
               <button
@@ -391,8 +401,8 @@ export function MoveEntriesDialog({
             {progress ? (
               <BulkProgressBar verb={t("moving")} progress={progress} />
             ) : null}
-          </DialogPanel>
-          <DialogFooter>
+          </ModalPanel>
+          <ModalFooter>
             <Button
               type="button"
               variant="outline"
@@ -413,10 +423,10 @@ export function MoveEntriesDialog({
                     name: segments[segments.length - 1]?.name ?? "",
                   })}
             </Button>
-          </DialogFooter>
-        </DialogContent>
+          </ModalFooter>
+        </ModalContent>
       ) : null}
-    </Dialog>
+    </Modal>
   )
 }
 
@@ -451,8 +461,8 @@ export function InfoEntryDialog({
   const modified = formatTimestamp(entry?.updatedAt, timeFormat)
 
   return (
-    <Drawer open={open} onOpenChange={onOpenChangeAction}>
-      <DrawerBackdrop className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs" />
+    <Drawer open={open} onOpenChange={onOpenChangeAction} backdrop="blur">
+
       {entry ? (
         <DrawerContent className="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col border-l border-border bg-background p-6 shadow-2xl">
           <DrawerHeader className="flex items-center justify-between border-b border-border/60 pb-4">
@@ -547,36 +557,36 @@ export function DeleteEntriesDialog({
   const open = targets.length > 0
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChangeAction}>
+    <Modal open={open} onOpenChange={onOpenChangeAction}>
       {open ? (
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle>
+        <ModalContent className="max-w-sm">
+          <ModalHeader>
+            <ModalTitle>
               {targets.length > 1
                 ? t("deleteItemsTitle", { count: targets.length })
                 : targets[0].kind === "folder"
                   ? t("deleteFolderTitle")
                   : t("deleteFileTitle")}
-            </DialogTitle>
-            <DialogDescription>
+            </ModalTitle>
+            <ModalDescription>
               {targets.length > 1
                 ? t("deleteItemsDescription", { count: targets.length })
                 : targets[0].kind === "folder"
                   ? t("deleteFolderDescription", { name: targets[0].name })
                   : t("deleteFileDescription", { name: targets[0].name })}
-            </DialogDescription>
-          </DialogHeader>
+            </ModalDescription>
+          </ModalHeader>
           {error || progress ? (
-            <DialogPanel className="space-y-2">
+            <ModalPanel className="space-y-2">
               {error ? (
                 <p className="text-sm text-destructive">{error}</p>
               ) : null}
               {progress ? (
                 <BulkProgressBar verb={t("deleting")} progress={progress} />
               ) : null}
-            </DialogPanel>
+            </ModalPanel>
           ) : null}
-          <DialogFooter>
+          <ModalFooter>
             <Button
               type="button"
               variant="outline"
@@ -593,10 +603,10 @@ export function DeleteEntriesDialog({
             >
               {tc("delete")}
             </Button>
-          </DialogFooter>
-        </DialogContent>
+          </ModalFooter>
+        </ModalContent>
       ) : null}
-    </Dialog>
+    </Modal>
   )
 }
 
@@ -663,23 +673,23 @@ export function ShareFileDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChangeAction}>
+    <Modal open={open} onOpenChange={onOpenChangeAction}>
       {file ? (
-        <DialogContent className="max-w-md">
-          <DialogHeader>
+        <ModalContent className="max-w-md">
+          <ModalHeader>
             <div className="flex items-center gap-3">
               <FileTypeIcon fileName={file.name ?? file.path} className="size-7" />
               <div className="min-w-0">
-                <DialogTitle className="truncate text-left">
+                <ModalTitle className="truncate text-left">
                   {t("shareFileTitle")}
-                </DialogTitle>
-                <DialogDescription className="text-left">
+                </ModalTitle>
+                <ModalDescription className="text-left">
                   {t("shareDescription", { name: file.name ?? file.path })}
-                </DialogDescription>
+                </ModalDescription>
               </div>
             </div>
-          </DialogHeader>
-          <DialogPanel>
+          </ModalHeader>
+          <ModalPanel>
             {shareUrl ? (
               <div className="space-y-2">
                 <p className="text-sm font-medium">{t("shareLinkLabel")}</p>
@@ -721,8 +731,8 @@ export function ShareFileDialog({
                 </Select>
               </div>
             )}
-          </DialogPanel>
-          <DialogFooter>
+          </ModalPanel>
+          <ModalFooter>
             {shareUrl ? (
               <Button type="button" onClick={() => onOpenChangeAction(false)}>
                 {tc("done")}
@@ -747,9 +757,9 @@ export function ShareFileDialog({
                 </Button>
               </>
             )}
-          </DialogFooter>
-        </DialogContent>
+          </ModalFooter>
+        </ModalContent>
       ) : null}
-    </Dialog>
+    </Modal>
   )
 }

@@ -7,7 +7,7 @@ import { siteConfig } from "@/lib/config/site"
 import { useConnections } from "@/lib/store/connection-store"
 import { useNavStore, type BrowseSection } from "@/lib/store/nav-store"
 import { useUploadUiStore } from "@/lib/store/upload-ui-store"
-import { Button } from "@/components/ui/button"
+import { Button } from "@heroui/react"
 import {
   Sidebar,
   SidebarContent,
@@ -19,8 +19,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-} from "@/components/ui/sidebar"
-import { Skeleton } from "@/components/ui/skeleton"
+} from "@heroui/react"
+import { Skeleton } from "@heroui/react"
 import {
   AppIcon,
   Clock01Icon,

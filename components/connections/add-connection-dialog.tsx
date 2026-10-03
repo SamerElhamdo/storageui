@@ -12,8 +12,8 @@ import {
   type WebdavAuthType,
 } from "@/lib/storage/connections"
 import { useConnections } from "@/lib/store/connection-store"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
+import { Button } from "@heroui/react"
+import { Checkbox } from "@heroui/react"
 import {
   Dialog,
   DialogContent,
@@ -22,15 +22,15 @@ import {
   DialogHeader,
   DialogPanel,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
+} from "@heroui/react"
+import { Input } from "@heroui/react"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@heroui/react"
 import {
   AlibabaCloudIcon,
   AwsIcon,
@@ -299,19 +299,19 @@ export function AddConnectionDialog() {
   }
 
   return (
-    <Dialog open={isAddDialogOpen} onOpenChange={setAddDialogOpen}>
+    <Modal open={isAddDialogOpen} onOpenChange={setAddDialogOpen}>
       {isAddDialogOpen ? (
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle>
+        <ModalContent className="max-w-lg">
+          <ModalHeader>
+            <ModalTitle>
               {editingConnection ? t("editTitle") : t("addTitle")}
-            </DialogTitle>
-            <DialogDescription>
+            </ModalTitle>
+            <ModalDescription>
               {editingConnection ? t("editDescription") : t("addDescription")}
-            </DialogDescription>
-          </DialogHeader>
+            </ModalDescription>
+          </ModalHeader>
 
-          <DialogPanel>
+          <ModalPanel>
             <Form
               id="add-connection-form"
               onSubmit={handleSubmit}
@@ -725,9 +725,9 @@ export function AddConnectionDialog() {
                 </p>
               ) : null}
             </Form>
-          </DialogPanel>
+          </ModalPanel>
 
-          <DialogFooter>
+          <ModalFooter>
             {editingConnection ? (
               <Button
                 type="button"
@@ -760,9 +760,9 @@ export function AddConnectionDialog() {
                   ? t("testAndUpdate")
                   : t("testAndSave")}
             </Button>
-          </DialogFooter>
-        </DialogContent>
+          </ModalFooter>
+        </ModalContent>
       ) : null}
-    </Dialog>
+    </Modal>
   )
 }

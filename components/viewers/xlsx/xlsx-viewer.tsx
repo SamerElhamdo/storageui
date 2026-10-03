@@ -18,7 +18,7 @@ import { useTranslations } from "next-intl"
 import { createPortal } from "react-dom"
 
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { Button } from "@heroui/react"
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -28,13 +28,13 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
+} from "@heroui/react"
+import { Input } from "@heroui/react"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@heroui/react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import {
   Select,
@@ -42,16 +42,11 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Separator } from "@/components/ui/separator"
-import { Spinner } from "@/components/ui/spinner"
+} from "@heroui/react"
+import { Separator } from "@heroui/react"
+import { Spinner } from "@heroui/react"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import {
   AppIcon,
   ArrowLeft01Icon,
@@ -491,8 +486,8 @@ function WorkbookFileActionsMenu({
   if (!showThemeControl && !showFileActions) return null
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+    <Dropdown>
+      <DropdownTrigger asChild>
         <Button
           type="button"
           variant="ghost"
@@ -501,14 +496,14 @@ function WorkbookFileActionsMenu({
         >
           <AppIcon icon={MoreHorizontalIcon} className="size-4" />
         </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent
+      </DropdownTrigger>
+      <DropdownContent
         align="end"
         className={cn("w-52", XLSX_DROPDOWN_Z_INDEX_CLASS)}
       >
         {showThemeControl ? (
           <>
-            <DropdownMenuCheckboxItem
+            <DropdownCheckboxItem
               checked={Boolean(isDark)}
               variant="switch"
               onCheckedChange={(checked) => onIsDarkChange?.(checked === true)}
@@ -517,24 +512,24 @@ function WorkbookFileActionsMenu({
                 <AppIcon icon={Moon02Icon} className="size-4" />
                 {t("darkMode")}
               </span>
-            </DropdownMenuCheckboxItem>
-            {showFileActions ? <DropdownMenuSeparator /> : null}
+            </DropdownCheckboxItem>
+            {showFileActions ? <DropdownSeparator /> : null}
           </>
         ) : null}
         {showDownloadButton && onDownload ? (
-          <DropdownMenuItem onClick={onDownload}>
+          <DropdownItem onClick={onDownload}>
             <AppIcon icon={Download01Icon} className="size-4" />
             {t("download")}
-          </DropdownMenuItem>
+          </DropdownItem>
         ) : null}
         {showUploadButton ? (
-          <DropdownMenuItem onClick={onUploadClick}>
+          <DropdownItem onClick={onUploadClick}>
             <AppIcon icon={Upload01Icon} className="size-4" />
             {t("upload")}
-          </DropdownMenuItem>
+          </DropdownItem>
         ) : null}
-      </DropdownMenuContent>
-    </DropdownMenu>
+      </DropdownContent>
+    </Dropdown>
   )
 }
 
@@ -563,8 +558,8 @@ function WorkbookTableHeaderMenu({
   const [open, setOpen] = React.useState(false)
 
   return (
-    <DropdownMenu open={open} onOpenChange={setOpen}>
-      <DropdownMenuTrigger asChild>
+    <Dropdown open={open} onOpenChange={setOpen}>
+      <DropdownTrigger asChild>
         <Button
           {...triggerProps}
           type="button"
@@ -579,12 +574,12 @@ function WorkbookTableHeaderMenu({
             <AppIcon icon={MoreHorizontalIcon} className="size-3.5" />
           )}
         </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent
+      </DropdownTrigger>
+      <DropdownContent
         align="end"
         className={cn("w-40", XLSX_DROPDOWN_Z_INDEX_CLASS)}
       >
-        <DropdownMenuRadioGroup
+        <DropdownRadioGroup
           value={direction ?? ""}
           onValueChange={(value) => {
             if (value === "ascending") {
@@ -595,15 +590,15 @@ function WorkbookTableHeaderMenu({
             setOpen(false)
           }}
         >
-          <DropdownMenuRadioItem value="ascending">
+          <DropdownRadioItem value="ascending">
             {t("sortAscending")}
-          </DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="descending">
+          </DropdownRadioItem>
+          <DropdownRadioItem value="descending">
             {t("sortDescending")}
-          </DropdownMenuRadioItem>
-        </DropdownMenuRadioGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+          </DropdownRadioItem>
+        </DropdownRadioGroup>
+      </DropdownContent>
+    </Dropdown>
   )
 }
 

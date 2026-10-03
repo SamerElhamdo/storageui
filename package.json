@@ -85,6 +85,7 @@
     "react": "19.2.7",
     "react-dom": "19.2.7",
     "react-markdown": "^10.1.0",
+    "react-pic-gallery": "^2.1.0",
     "react-player": "^3.4.0",
     "react-resizable-panels": "^4.12.2",
     "react-responsive-carousel": "^3.2.23",
