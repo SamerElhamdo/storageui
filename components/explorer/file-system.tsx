@@ -2706,17 +2706,17 @@ function FileSystemSortSelect({
   return (
     <Dropdown>
       <Dropdown.Trigger>
-        <button
-          type="button"
+        <span
+          role="button"
           aria-label={t("sortBy")}
           title={t("sortBy")}
-          className="flex h-7 min-h-7 items-center gap-1.5 rounded-lg border border-input bg-popover px-2.5 text-xs font-medium transition-colors hover:bg-accent outline-none"
+          className="flex h-7 min-h-7 items-center gap-1.5 rounded-lg border border-input bg-popover px-2.5 text-xs font-medium transition-colors hover:bg-accent outline-none cursor-pointer select-none"
         >
           <AppIcon icon={ArrowUpDownIcon} className="size-3.5" />
           {layout === "full" && showLabel && activeOption
             ? t(SORT_TRIGGER_KEYS[activeOption.key])
             : null}
-        </button>
+        </span>
       </Dropdown.Trigger>
       <Dropdown.Popover className="z-50 min-w-36 rounded-xl border border-border/80 bg-popover p-1 shadow-lg backdrop-blur-md">
         <Dropdown.Menu>
