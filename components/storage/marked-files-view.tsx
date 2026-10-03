@@ -2,11 +2,10 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
+import { Card, CardContent, Chip, Button as HeroUIButton } from "@heroui/react"
 
 import type { MarkedFile } from "@/lib/store/file-marks-store"
 import { cn } from "@/lib/utils"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import {
   FileSystemIconSpriteSheet,
   FileTypeIcon,
@@ -14,9 +13,9 @@ import {
 import {
   AppIcon,
   Clock01Icon,
+  Delete02Icon,
   FavouriteIcon,
 } from "@/components/foundations/icons"
-import { NEUTRAL_BADGE_CLASSNAME } from "@/components/storage/badge-styles"
 
 type MarkedFilesViewProps = {
   section: "recents" | "starred"
@@ -86,96 +85,99 @@ export function MarkedFilesView({
 }: MarkedFilesViewProps) {
   const t = useTranslations("Marked")
   return (
-    <div className="flex h-full min-h-0 flex-col">
+    <div className="flex h-full min-h-0 flex-col bg-background/50">
       <FileSystemIconSpriteSheet />
-      <div className="flex h-11 shrink-0 items-center justify-between gap-2 border-b px-3">
-        <div className="flex min-w-0 items-center gap-2">
+      <div className="flex h-12 shrink-0 items-center justify-between gap-2 border-b border-border/80 px-4 bg-muted/30">
+        <div className="flex min-w-0 items-center gap-2.5">
           {headerLeading}
-          <span className="text-sm font-medium">{t(section)}</span>
-          <Badge
-            variant="outline"
-            className={cn(NEUTRAL_BADGE_CLASSNAME, "truncate text-sm")}
-          >
+          <div className="flex items-center gap-2">
+            <AppIcon
+              icon={section === "recents" ? Clock01Icon : FavouriteIcon}
+              className="size-4 text-primary"
+            />
+            <span className="text-sm font-semibold">{t(section)}</span>
+          </div>
+          <Chip className="bg-primary/10 text-primary font-medium text-xs px-2 h-6">
             {connectionName}
-          </Badge>
+          </Chip>
+          <Chip className="bg-muted text-muted-foreground font-medium text-xs px-2 h-6">
+            {files.length}
+          </Chip>
         </div>
         {section === "recents" && files.length > 0 ? (
-          <Button size="sm" variant="ghost" onClick={onClearRecentsAction}>
+          <button
+            type="button"
+            onClick={onClearRecentsAction}
+            className="flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive outline-none"
+          >
+            <AppIcon icon={Delete02Icon} className="size-3.5" />
             {t("clearRecents")}
-          </Button>
+          </button>
         ) : null}
       </div>
 
       {files.length === 0 ? (
-        <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
-          <div className="flex size-12 items-center justify-center rounded-xl bg-muted text-muted-foreground">
+        <div className="flex flex-1 flex-col items-center justify-center gap-4 p-8 text-center">
+          <div className="flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-inner">
             <AppIcon
               icon={section === "recents" ? Clock01Icon : FavouriteIcon}
-              className="size-6"
+              className="size-7"
             />
           </div>
-          <div className="space-y-1">
-            <h2 className="text-base font-semibold">
+          <div className="space-y-1.5 max-w-sm">
+            <h2 className="text-base font-semibold text-foreground">
               {section === "recents" ? t("noRecents") : t("noStarred")}
             </h2>
-            <p className="max-w-sm text-sm text-muted-foreground">
+            <p className="text-xs text-muted-foreground leading-relaxed">
               {section === "recents" ? t("recentsHint") : t("starredHint")}
             </p>
           </div>
         </div>
       ) : (
-        <div className="min-h-0 flex-1 overflow-y-auto">
-          <div className="divide-y">
+        <div className="min-h-0 flex-1 overflow-y-auto p-4 no-scrollbar">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {files.map((file) => {
               const starred = isStarredAction(file.key)
               return (
-                <div
+                <Card
                   key={file.key}
-                  role="button"
-                  tabIndex={0}
+                  className="group relative flex flex-row items-center gap-3 p-3 rounded-xl border border-border/60 bg-card hover:border-primary/40 hover:shadow-md transition-all duration-200 cursor-pointer"
                   onClick={() => onOpenAction(file)}
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter" || event.key === " ") {
-                      event.preventDefault()
-                      onOpenAction(file)
-                    }
-                  }}
-                  className="group flex cursor-pointer items-center gap-3 px-3 py-2.5 outline-none hover:bg-accent/50 focus-visible:bg-accent/50"
                 >
                   <FileTypeIcon
                     fileName={file.name ?? basename(file.path)}
-                    className="size-7"
+                    className="size-9 shrink-0 drop-shadow-xs"
                   />
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium">
+                  <div className="min-w-0 flex-1 space-y-0.5">
+                    <p className="truncate text-xs font-semibold text-foreground group-hover:text-primary transition-colors">
                       {displayName(file, showFileExtensions)}
                     </p>
-                    <p className="truncate text-xs text-muted-foreground">
-                      {metaLine(file) || file.path}
-                    </p>
+                    {metaLine(file) ? (
+                      <p className="truncate text-[11px] text-muted-foreground">
+                        {metaLine(file)}
+                      </p>
+                    ) : null}
                   </div>
-                  <Button
-                    size="icon-sm"
-                    variant="ghost"
-                    aria-label={starred ? t("removeStar") : t("addStar")}
-                    title={starred ? t("removeStar") : t("addStar")}
-                    onClick={(event) => {
-                      event.stopPropagation()
+                  <button
+                    type="button"
+                    aria-label={starred ? t("unstar") : t("star")}
+                    onClick={(e) => {
+                      e.stopPropagation()
                       onToggleStarAction(file)
                     }}
                     className={cn(
-                      "shrink-0 transition-opacity",
+                      "flex size-7 shrink-0 items-center justify-center rounded-lg transition-colors outline-none",
                       starred
-                        ? "text-amber-500 hover:text-amber-500"
-                        : "text-muted-foreground opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
+                        ? "text-amber-500 bg-amber-500/10 hover:bg-amber-500/20"
+                        : "text-muted-foreground/40 hover:text-amber-500 hover:bg-muted"
                     )}
                   >
                     <AppIcon
                       icon={FavouriteIcon}
-                      className={starred ? "fill-current" : undefined}
+                      className={cn("size-4", starred && "fill-amber-500")}
                     />
-                  </Button>
-                </div>
+                  </button>
+                </Card>
               )
             })}
           </div>

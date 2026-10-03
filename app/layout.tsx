@@ -14,6 +14,7 @@ import { TooltipProvider } from "@/components/ui/tooltip"
 import { ActiveThemeProvider } from "@/components/providers/active-theme"
 import { TailwindIndicator } from "@/components/providers/tailwind-indicator"
 import { ThemeFavicon } from "@/components/providers/theme-favicon"
+import { HeroUIClientProvider } from "@/components/providers/heroui-provider"
 import { ThemeProvider } from "@/components/providers/theme-provider"
 
 import "@/app/globals.css"
@@ -133,16 +134,18 @@ export default async function RootLayout({
       >
         <NextIntlClientProvider>
           <ThemeProvider>
-            <ThemeFavicon />
-            <ActiveThemeProvider>
-              <NuqsAdapter>
-                <TooltipProvider delayDuration={0}>
-                  {children}
-                  <Toaster position="top-center" />
-                </TooltipProvider>
-              </NuqsAdapter>
-              <TailwindIndicator />
-            </ActiveThemeProvider>
+            <HeroUIClientProvider>
+              <ThemeFavicon />
+              <ActiveThemeProvider>
+                <NuqsAdapter>
+                  <TooltipProvider delayDuration={0}>
+                    {children}
+                    <Toaster position="top-center" />
+                  </TooltipProvider>
+                </NuqsAdapter>
+                <TailwindIndicator />
+              </ActiveThemeProvider>
+            </HeroUIClientProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
         <Analytics />

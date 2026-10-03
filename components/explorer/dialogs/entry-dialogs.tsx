@@ -656,13 +656,13 @@ export function ShareFileDialog({
         <DialogContent className="max-w-md">
           <DialogHeader>
             <div className="flex items-center gap-3">
-              <FileTypeIcon fileName={file.name} className="size-7" />
+              <FileTypeIcon fileName={file.name ?? file.path} className="size-7" />
               <div className="min-w-0">
                 <DialogTitle className="truncate text-left">
                   {t("shareFileTitle")}
                 </DialogTitle>
                 <DialogDescription className="text-left">
-                  {t("shareDescription", { name: file.name })}
+                  {t("shareDescription", { name: file.name ?? file.path })}
                 </DialogDescription>
               </div>
             </div>

@@ -3,6 +3,7 @@ import { DragDropProvider, DragOverlay, PointerSensor } from "@dnd-kit/react"
 import { useTranslations } from "next-intl"
 import { createPortal } from "react-dom"
 import { toast } from "sonner"
+import { Chip, Kbd } from "@heroui/react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -302,6 +303,62 @@ function FileSystemDragPreview({
         ) : null}
       </div>
     </div>
+  )
+}
+
+function FileSystemBreadcrumbs({
+  currentPath,
+  title,
+  titleBadge,
+  onNavigate,
+}: {
+  currentPath: string
+  title: string
+  titleBadge?: React.ReactNode
+  onNavigate: (path: string) => void
+}) {
+  const parts = currentPath.split("/").filter(Boolean)
+
+  return (
+    <nav className="flex min-w-0 items-center gap-1 overflow-x-auto text-xs font-medium no-scrollbar">
+      <button
+        type="button"
+        onClick={() => onNavigate("")}
+        className={cn(
+          "flex shrink-0 items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium transition-colors outline-none",
+          parts.length === 0
+            ? "bg-primary/10 text-primary font-semibold"
+            : "text-muted-foreground hover:bg-accent hover:text-foreground"
+        )}
+      >
+        <AppIcon icon={Folder01Icon} className="size-3.5" />
+        <span className="truncate max-w-[120px]">{title}</span>
+        {parts.length === 0 ? titleBadge : null}
+      </button>
+
+      {parts.map((part, index) => {
+        const fullPath = parts.slice(0, index + 1).join("/") + "/"
+        const isLast = index === parts.length - 1
+
+        return (
+          <React.Fragment key={fullPath}>
+            <span className="text-muted-foreground/40 select-none">/</span>
+            <button
+              type="button"
+              onClick={() => onNavigate(fullPath)}
+              className={cn(
+                "flex shrink-0 items-center gap-1 rounded-md px-2 py-1 text-xs transition-colors outline-none",
+                isLast
+                  ? "bg-primary/10 text-primary font-semibold"
+                  : "text-muted-foreground hover:bg-accent hover:text-foreground"
+              )}
+            >
+              <span className="truncate max-w-[140px]">{part}</span>
+            </button>
+          </React.Fragment>
+        )
+      })}
+    </nav>
   )
 }
 
@@ -1904,11 +1961,13 @@ export function FileSystem({
                 <AppIcon icon={ArrowRight01Icon} className="size-4.5" />
               </button>
               {headerLayout !== "minimal" ? (
-                <div className="ml-1.5 flex min-w-0 items-center gap-1.5">
-                  <span className="truncate text-sm font-semibold">
-                    {currentFolderName}
-                  </span>
-                  {currentPath === "" ? titleBadge : null}
+                <div className="ml-1.5 flex min-w-0 items-center">
+                  <FileSystemBreadcrumbs
+                    currentPath={currentPath}
+                    title={title}
+                    titleBadge={titleBadge}
+                    onNavigate={navigateTo}
+                  />
                 </div>
               ) : null}
             </div>
@@ -2593,7 +2652,9 @@ function FileSystemSearchField({
         >
           <AppIcon icon={Cancel01Icon} className="size-3" />
         </button>
-      ) : null}
+      ) : (
+        <Kbd className="pointer-events-none absolute right-1.5 hidden text-[10px] sm:inline-flex">⌘F</Kbd>
+      )}
     </div>
   )
 

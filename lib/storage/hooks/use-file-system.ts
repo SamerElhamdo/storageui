@@ -105,6 +105,8 @@ export type S3FileSystem = {
   renameEntry: (item: FileSystemItem, name: string) => Promise<void>
   /** Move a file or folder into another folder (`""` is the bucket root). */
   moveEntry: (item: FileSystemItem, destinationFolder: string) => Promise<void>
+  /** Generate a shareable URL for a file. */
+  shareFile: (item: FileSystemFileItem, expiresIn?: number) => Promise<string>
   /** Re-fetch the bucket root listing (e.g. after an upload). */
   refresh: () => void
   /** `null` when the route cannot serve this bucket; see `thumbnailHandleFor`. */
@@ -574,7 +576,7 @@ export function useS3FileSystem(connection: Connection | null): S3FileSystem {
   )
 
   const shareFile = React.useCallback(
-    async (item: FileSystemFileItem, expiresIn: number) => {
+    async (item: FileSystemFileItem, expiresIn: number = 86400) => {
       const ops = await opsPromise
       if (!ops) throw new Error("No active connection")
       try {

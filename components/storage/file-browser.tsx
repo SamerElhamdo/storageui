@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
+import { Card, Chip } from "@heroui/react"
 
 import { getFileKind } from "@/lib/file-kind"
 import { useS3FileSystem } from "@/lib/storage/hooks/use-file-system"
@@ -80,20 +81,27 @@ function EmptyState() {
   const t = useTranslations("Browser")
   const { openAddDialog } = useConnections()
   return (
-    <div className="flex h-full flex-col items-center justify-center gap-4 p-8 text-center">
-      <div className="flex size-12 items-center justify-center rounded-xl bg-muted text-muted-foreground">
-        <AppIcon icon={CloudServerIcon} className="size-6" />
-      </div>
-      <div className="space-y-1">
-        <h2 className="text-base font-semibold">{t("noBucketTitle")}</h2>
-        <p className="max-w-sm text-sm text-muted-foreground">
-          {t("noBucketDescription")}
-        </p>
-      </div>
-      <Button onClick={openAddDialog}>
-        <AppIcon icon={PlusSignCircleIcon} className="size-4" />
-        {t("addConnection")}
-      </Button>
+    <div className="flex h-full flex-col items-center justify-center p-8 text-center bg-background/50">
+      <Card className="flex flex-col items-center justify-center gap-5 p-8 max-w-md w-full border border-border/80 bg-card/80 shadow-xl backdrop-blur-md">
+        <div className="flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-inner">
+          <AppIcon icon={CloudServerIcon} className="size-7" />
+        </div>
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-center gap-2 mb-1">
+            <h2 className="text-base font-semibold text-foreground">{t("noBucketTitle")}</h2>
+            <Chip className="bg-amber-500/10 text-amber-600 dark:text-amber-400 font-medium text-[11px] h-5 px-1.5">
+              Storage
+            </Chip>
+          </div>
+          <p className="max-w-sm text-xs text-muted-foreground leading-relaxed">
+            {t("noBucketDescription")}
+          </p>
+        </div>
+        <Button size="sm" className="rounded-xl px-4 py-2 font-medium shadow-md transition-all hover:scale-105" onClick={openAddDialog}>
+          <AppIcon icon={PlusSignCircleIcon} className="size-4" />
+          {t("addConnection")}
+        </Button>
+      </Card>
     </div>
   )
 }
