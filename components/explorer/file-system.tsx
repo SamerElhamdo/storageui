@@ -3,7 +3,7 @@ import { DragDropProvider, DragOverlay, PointerSensor } from "@dnd-kit/react"
 import { useTranslations } from "next-intl"
 import { createPortal } from "react-dom"
 import { toast } from "sonner"
-import { Chip, Kbd } from "@heroui/react"
+import { Chip, Kbd, Toolbar, Dropdown, Form } from "@heroui/react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -1937,7 +1937,7 @@ export function FileSystem({
           )}
         >
           <FileSystemIconSpriteSheet />
-          <div className="relative grid h-12 shrink-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 border-b bg-muted/40 px-2">
+          <Toolbar className="relative grid h-12 shrink-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 border-b bg-muted/40 px-2">
             <div className="flex min-w-0 items-center gap-0.5">
               {headerLeading}
               <button
@@ -1979,8 +1979,6 @@ export function FileSystem({
                 <SelectTrigger
                   size="sm"
                   aria-label={t("view")}
-                  // Icon-only like the sort select: sheds the base min-width to
-                  // hug icon + chevron at the filter button's 28px height.
                   className="h-7 min-h-7 w-auto min-w-0 [&_svg]:size-4"
                 >
                   <SelectValue>
@@ -2048,7 +2046,7 @@ export function FileSystem({
                 value={searchInput}
               />
             </div>
-          </div>
+          </Toolbar>
           {hasActiveFilters ? (
             <div className="flex shrink-0 flex-wrap items-center gap-1 border-b bg-muted/20 px-2 py-1.5 text-xs text-muted-foreground">
               {filters.map((filter) => {
@@ -2706,33 +2704,37 @@ function FileSystemSortSelect({
   const activeOption = SORT_OPTIONS.find((option) => option.key === sort.key)
 
   return (
-    <Select
-      value={sort.key}
-      onValueChange={(value) => onKeyChange(value as FileSystemSortKey)}
-    >
-      <SelectTrigger
-        size="sm"
-        aria-label={t("sortBy")}
-        title={t("sortBy")}
-        className="h-7 min-h-7 w-auto min-w-0 shrink-0 [&_svg]:size-4"
-      >
-        <SelectValue>
-          <span className="flex items-center gap-1.5">
-            <AppIcon icon={ArrowUpDownIcon} className="size-4" />
-            {layout === "full" && showLabel && activeOption
-              ? t(SORT_TRIGGER_KEYS[activeOption.key])
-              : null}
-          </span>
-        </SelectValue>
-      </SelectTrigger>
-      <SelectContent align="end" alignItemWithTrigger={false}>
-        {SORT_OPTIONS.map((option) => (
-          <SelectItem key={option.key} value={option.key}>
-            {t(SORT_LABEL_KEYS[option.key])}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <Dropdown>
+      <Dropdown.Trigger>
+        <button
+          type="button"
+          aria-label={t("sortBy")}
+          title={t("sortBy")}
+          className="flex h-7 min-h-7 items-center gap-1.5 rounded-lg border border-input bg-popover px-2.5 text-xs font-medium transition-colors hover:bg-accent outline-none"
+        >
+          <AppIcon icon={ArrowUpDownIcon} className="size-3.5" />
+          {layout === "full" && showLabel && activeOption
+            ? t(SORT_TRIGGER_KEYS[activeOption.key])
+            : null}
+        </button>
+      </Dropdown.Trigger>
+      <Dropdown.Popover className="z-50 min-w-36 rounded-xl border border-border/80 bg-popover p-1 shadow-lg backdrop-blur-md">
+        <Dropdown.Menu>
+          {SORT_OPTIONS.map((option) => (
+            <Dropdown.Item
+              key={option.key}
+              onClick={() => onKeyChange(option.key)}
+              className={cn(
+                "flex cursor-pointer items-center rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors outline-none hover:bg-accent hover:text-foreground",
+                sort.key === option.key && "bg-primary/10 text-primary font-semibold"
+              )}
+            >
+              {t(SORT_LABEL_KEYS[option.key])}
+            </Dropdown.Item>
+          ))}
+        </Dropdown.Menu>
+      </Dropdown.Popover>
+    </Dropdown>
   )
 }
 

@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
+import { Form } from "@heroui/react"
 
 import { toConnectionRef } from "@/lib/storage/connection-ref"
 import {
@@ -311,7 +312,7 @@ export function AddConnectionDialog() {
           </DialogHeader>
 
           <DialogPanel>
-            <form
+            <Form
               id="add-connection-form"
               onSubmit={handleSubmit}
               onKeyDown={(event) => {
@@ -723,7 +724,7 @@ export function AddConnectionDialog() {
                   {error}
                 </p>
               ) : null}
-            </form>
+            </Form>
           </DialogPanel>
 
           <DialogFooter>

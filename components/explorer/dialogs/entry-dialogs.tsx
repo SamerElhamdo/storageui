@@ -3,6 +3,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { toast } from "sonner"
+import { Drawer, Form, Chip } from "@heroui/react"
 
 import { usePreferencesStore } from "@/lib/store/preferences-store"
 import { cn } from "@/lib/utils"
@@ -107,7 +108,7 @@ export function NewFolderDialog({
             </DialogDescription>
           </DialogHeader>
           <DialogPanel>
-            <form
+            <Form
               id="new-folder-form"
               className="grid gap-2"
               onSubmit={(event) => {
@@ -125,7 +126,7 @@ export function NewFolderDialog({
               {error ? (
                 <p className="text-sm text-destructive">{error}</p>
               ) : null}
-            </form>
+            </Form>
           </DialogPanel>
           <DialogFooter>
             <Button
@@ -194,7 +195,7 @@ export function RenameEntryDialog({
             </DialogDescription>
           </DialogHeader>
           <DialogPanel>
-            <form
+            <Form
               id="rename-entry-form"
               className="grid gap-2"
               onSubmit={(event) => {
@@ -214,7 +215,7 @@ export function RenameEntryDialog({
               {error ? (
                 <p className="text-sm text-destructive">{error}</p>
               ) : null}
-            </form>
+            </Form>
           </DialogPanel>
           <DialogFooter>
             <Button
@@ -450,68 +451,79 @@ export function InfoEntryDialog({
   const modified = formatTimestamp(entry?.updatedAt, timeFormat)
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChangeAction}>
+    <Drawer open={open} onOpenChange={onOpenChangeAction}>
+      <DrawerBackdrop className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs" />
       {entry ? (
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <div className="flex items-center gap-3">
+        <DrawerContent className="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col border-l border-border bg-background p-6 shadow-2xl">
+          <DrawerHeader className="flex items-center justify-between border-b border-border/60 pb-4">
+            <div className="flex items-center gap-3 min-w-0">
               {isFolder ? (
-                <FileSystemFolderGlyph className="h-7 w-auto shrink-0" />
+                <FileSystemFolderGlyph className="h-8 w-auto shrink-0 drop-shadow-xs" />
               ) : (
-                <FileTypeIcon fileName={entry.name} className="size-7" />
+                <FileTypeIcon fileName={entry.name} className="size-8 shrink-0 drop-shadow-xs" />
               )}
               <div className="min-w-0">
-                <DialogTitle className="truncate text-left">
+                <DrawerHeading className="truncate text-base font-bold text-foreground">
                   {entry.name}
-                </DialogTitle>
-                <DialogDescription className="text-left">
-                  {isFolder ? t("infoFolder") : (typeLabel ?? t("infoFile"))}
-                </DialogDescription>
+                </DrawerHeading>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <Chip className="bg-primary/10 text-primary font-medium text-[11px] h-5 px-1.5">
+                    {isFolder ? t("infoFolder") : (typeLabel ?? t("infoFile"))}
+                  </Chip>
+                </div>
               </div>
             </div>
-          </DialogHeader>
-          <DialogPanel>
-            <dl className="divide-y">
-              {!isFolder && size ? (
-                <InfoRow label={t("infoSize")} value={size} />
-              ) : null}
-              {!isFolder && typeLabel ? (
-                <InfoRow label={t("infoType")} value={typeLabel} />
-              ) : null}
-              <InfoRow
-                label={t("infoLocation")}
-                value={<span className="break-all">{location}</span>}
-              />
-              <InfoRow
-                label={t("infoPath")}
-                value={<span className="break-all">{entry.path}</span>}
-              />
-              {created ? (
-                <InfoRow label={t("infoCreated")} value={created} />
-              ) : null}
-              {modified ? (
-                <InfoRow label={t("infoModified")} value={modified} />
-              ) : null}
-              {!isFolder && entry.etag ? (
+            <DrawerCloseTrigger className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground">
+              ✕
+            </DrawerCloseTrigger>
+          </DrawerHeader>
+          <DrawerBody className="flex-1 overflow-y-auto py-4 space-y-4 no-scrollbar">
+            <div className="rounded-xl border border-border/60 bg-card/60 p-4 space-y-3 shadow-xs">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                المعلومات والخصائص
+              </h4>
+              <dl className="divide-y divide-border/40">
+                {!isFolder && size ? (
+                  <InfoRow label={t("infoSize")} value={<span className="font-semibold">{size}</span>} />
+                ) : null}
+                {!isFolder && typeLabel ? (
+                  <InfoRow label={t("infoType")} value={typeLabel} />
+                ) : null}
                 <InfoRow
-                  label="ETag"
-                  value={
-                    <span className="break-all">
-                      {entry.etag.replace(/"/g, "")}
-                    </span>
-                  }
+                  label={t("infoLocation")}
+                  value={<span className="break-all font-mono text-xs">{location}</span>}
                 />
-              ) : null}
-            </dl>
-          </DialogPanel>
-          <DialogFooter>
+                <InfoRow
+                  label={t("infoPath")}
+                  value={<span className="break-all font-mono text-xs">{entry.path}</span>}
+                />
+                {created ? (
+                  <InfoRow label={t("infoCreated")} value={created} />
+                ) : null}
+                {modified ? (
+                  <InfoRow label={t("infoModified")} value={modified} />
+                ) : null}
+                {!isFolder && entry.etag ? (
+                  <InfoRow
+                    label="ETag"
+                    value={
+                      <span className="break-all font-mono text-xs text-muted-foreground">
+                        {entry.etag.replace(/"/g, "")}
+                      </span>
+                    }
+                  />
+                ) : null}
+              </dl>
+            </div>
+          </DrawerBody>
+          <DrawerFooter className="border-t border-border/60 pt-4 flex items-center justify-end gap-2">
             <Button type="button" onClick={() => onOpenChangeAction(false)}>
               {tc("done")}
             </Button>
-          </DialogFooter>
-        </DialogContent>
+          </DrawerFooter>
+        </DrawerContent>
       ) : null}
-    </Dialog>
+    </Drawer>
   )
 }
 
