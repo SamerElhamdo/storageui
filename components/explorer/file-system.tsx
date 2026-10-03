@@ -29,15 +29,6 @@ import {
   DialogTitle,
 } from "@heroui/react"
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-} from "@heroui/react"
-import {
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -2846,67 +2837,78 @@ function FileSystemFilterMenu({
 
   return (
     <Dropdown>
-      <DropdownTrigger
-        render={
-          <Button
-            type="button"
-            variant="outline"
-            size="icon-sm"
-            aria-label={t("filter")}
-            title={t("filter")}
-            className="relative size-7 sm:size-7"
-          />
-        }
-      >
-        <AppIcon icon={FilterIcon} className="size-4" />
-        {filters.length > 0 ? (
-          <span className="absolute top-1 right-1 size-1.5 rounded-full bg-primary" />
-        ) : null}
-      </DropdownTrigger>
-      <DropdownContent align="end" className="min-w-44">
-        <DropdownSub>
-          <DropdownSubTrigger>
-            <AppIcon
-              icon={File01Icon}
-              className="size-4 text-muted-foreground"
-            />
-            {t("filterFileType")}
-          </DropdownSubTrigger>
-          <DropdownSubContent className="w-60">
-            <FileSystemFileTypeCommand
-              checkedMimes={fileTypeFilter?.value ?? []}
-              onToggle={onToggleFileType}
-              options={fileTypeOptions}
-            />
-          </DropdownSubContent>
-        </DropdownSub>
-        {(["dateModified", "dateCreated"] as const).map((type) => (
-          <DropdownSub key={type}>
-            <DropdownSubTrigger>
+      <Dropdown.Trigger>
+        <Button
+          type="button"
+          variant="outline"
+          size="icon-sm"
+          aria-label={t("filter")}
+          title={t("filter")}
+          className="relative size-7 sm:size-7"
+        >
+          <AppIcon icon={FilterIcon} className="size-4" />
+          {filters.length > 0 ? (
+            <span className="absolute top-1 right-1 size-1.5 rounded-full bg-primary" />
+          ) : null}
+        </Button>
+      </Dropdown.Trigger>
+      <Dropdown.Popover className="min-w-44">
+        <Dropdown.Menu>
+          <Dropdown.SubmenuTrigger>
+            <Dropdown.Item
+              key="file-type"
+              className="flex items-center gap-2"
+              onAction={() => {}}
+            >
               <AppIcon
-                icon={Calendar03Icon}
+                icon={File01Icon}
                 className="size-4 text-muted-foreground"
               />
-              {t(FILTER_TYPE_KEYS[type])}
-            </DropdownSubTrigger>
-            <DropdownSubContent>
-              <ScrollArea orientation="vertical" className="h-auto max-h-72">
-                {DATE_FILTER_PRESETS.map((preset) => (
-                  <DropdownItem
-                    key={preset}
-                    onClick={() => onSelectDatePreset(type, preset)}
-                  >
-                    {t(DATE_PRESET_KEYS[preset])}
-                  </DropdownItem>
-                ))}
-                <DropdownItem onClick={() => onOpenCustomRange(type)}>
-                  {t("customRange")}
-                </DropdownItem>
-              </ScrollArea>
-            </DropdownSubContent>
-          </DropdownSub>
-        ))}
-      </DropdownContent>
+              {t("filterFileType")}
+            </Dropdown.Item>
+            <Dropdown.Popover className="w-60">
+              <Dropdown.Menu>
+                <FileSystemFileTypeCommand
+                  checkedMimes={fileTypeFilter?.value ?? []}
+                  onToggle={onToggleFileType}
+                  options={fileTypeOptions}
+                />
+              </Dropdown.Menu>
+            </Dropdown.Popover>
+          </Dropdown.SubmenuTrigger>
+          {(["dateModified", "dateCreated"] as const).map((type) => (
+            <Dropdown.SubmenuTrigger key={type}>
+              <Dropdown.Item
+                className="flex items-center gap-2"
+                onAction={() => {}}
+              >
+                <AppIcon
+                  icon={Calendar03Icon}
+                  className="size-4 text-muted-foreground"
+                />
+                {t(FILTER_TYPE_KEYS[type])}
+              </Dropdown.Item>
+              <Dropdown.Popover>
+                <Dropdown.Menu>
+                  <ScrollArea orientation="vertical" className="h-auto max-h-72">
+                    {DATE_FILTER_PRESETS.map((preset) => (
+                      <Dropdown.Item
+                        key={preset}
+                        onClick={() => onSelectDatePreset(type, preset)}
+                      >
+                        {t(DATE_PRESET_KEYS[preset])}
+                      </Dropdown.Item>
+                    ))}
+                    <Dropdown.Item onClick={() => onOpenCustomRange(type)}>
+                      {t("customRange")}
+                    </Dropdown.Item>
+                  </ScrollArea>
+                </Dropdown.Menu>
+              </Dropdown.Popover>
+            </Dropdown.SubmenuTrigger>
+          ))}
+        </Dropdown.Menu>
+      </Dropdown.Popover>
     </Dropdown>
   )
 }

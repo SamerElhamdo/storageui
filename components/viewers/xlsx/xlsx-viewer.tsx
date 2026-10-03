@@ -18,17 +18,7 @@ import { useTranslations } from "next-intl"
 import { createPortal } from "react-dom"
 
 import { cn } from "@/lib/utils"
-import { Button } from "@heroui/react"
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@heroui/react"
+import { Button, Dropdown } from "@heroui/react"
 import { Input } from "@heroui/react"
 import {
   Popover,
@@ -487,7 +477,7 @@ function WorkbookFileActionsMenu({
 
   return (
     <Dropdown>
-      <DropdownTrigger asChild>
+      <Dropdown.Trigger>
         <Button
           type="button"
           variant="ghost"
@@ -496,39 +486,41 @@ function WorkbookFileActionsMenu({
         >
           <AppIcon icon={MoreHorizontalIcon} className="size-4" />
         </Button>
-      </DropdownTrigger>
-      <DropdownContent
-        align="end"
+      </Dropdown.Trigger>
+      <Dropdown.Popover
+        placement="bottom end"
         className={cn("w-52", XLSX_DROPDOWN_Z_INDEX_CLASS)}
       >
-        {showThemeControl ? (
-          <>
-            <DropdownCheckboxItem
-              checked={Boolean(isDark)}
-              variant="switch"
-              onCheckedChange={(checked) => onIsDarkChange?.(checked === true)}
-            >
-              <span className="flex min-w-0 items-center gap-2">
+        <Dropdown.Menu>
+          {showThemeControl ? (
+            <>
+              <Dropdown.Item
+                onClick={() => onIsDarkChange?.(!isDark)}
+                className="flex items-center gap-2"
+              >
                 <AppIcon icon={Moon02Icon} className="size-4" />
                 {t("darkMode")}
-              </span>
-            </DropdownCheckboxItem>
-            {showFileActions ? <DropdownSeparator /> : null}
-          </>
-        ) : null}
-        {showDownloadButton && onDownload ? (
-          <DropdownItem onClick={onDownload}>
-            <AppIcon icon={Download01Icon} className="size-4" />
-            {t("download")}
-          </DropdownItem>
-        ) : null}
-        {showUploadButton ? (
-          <DropdownItem onClick={onUploadClick}>
-            <AppIcon icon={Upload01Icon} className="size-4" />
-            {t("upload")}
-          </DropdownItem>
-        ) : null}
-      </DropdownContent>
+                <Dropdown.ItemIndicator type="checkmark" />
+              </Dropdown.Item>
+              {showFileActions ? (
+                <div className="my-1 h-px bg-border" />
+              ) : null}
+            </>
+          ) : null}
+          {showDownloadButton && onDownload ? (
+            <Dropdown.Item onClick={onDownload}>
+              <AppIcon icon={Download01Icon} className="size-4" />
+              {t("download")}
+            </Dropdown.Item>
+          ) : null}
+          {showUploadButton ? (
+            <Dropdown.Item onClick={onUploadClick}>
+              <AppIcon icon={Upload01Icon} className="size-4" />
+              {t("upload")}
+            </Dropdown.Item>
+          ) : null}
+        </Dropdown.Menu>
+      </Dropdown.Popover>
     </Dropdown>
   )
 }
@@ -559,7 +551,7 @@ function WorkbookTableHeaderMenu({
 
   return (
     <Dropdown open={open} onOpenChange={setOpen}>
-      <DropdownTrigger asChild>
+      <Dropdown.Trigger>
         <Button
           {...triggerProps}
           type="button"
@@ -574,30 +566,38 @@ function WorkbookTableHeaderMenu({
             <AppIcon icon={MoreHorizontalIcon} className="size-3.5" />
           )}
         </Button>
-      </DropdownTrigger>
-      <DropdownContent
-        align="end"
+      </Dropdown.Trigger>
+      <Dropdown.Popover
+        placement="bottom end"
         className={cn("w-40", XLSX_DROPDOWN_Z_INDEX_CLASS)}
       >
-        <DropdownRadioGroup
-          value={direction ?? ""}
-          onValueChange={(value) => {
-            if (value === "ascending") {
+        <Dropdown.Menu>
+          <Dropdown.Item
+            key="ascending"
+            onClick={() => {
               sortAscending()
-            } else {
-              sortDescending()
-            }
-            setOpen(false)
-          }}
-        >
-          <DropdownRadioItem value="ascending">
+              setOpen(false)
+            }}
+          >
             {t("sortAscending")}
-          </DropdownRadioItem>
-          <DropdownRadioItem value="descending">
+            {direction === "ascending" ? (
+              <Dropdown.ItemIndicator type="checkmark" />
+            ) : null}
+          </Dropdown.Item>
+          <Dropdown.Item
+            key="descending"
+            onClick={() => {
+              sortDescending()
+              setOpen(false)
+            }}
+          >
             {t("sortDescending")}
-          </DropdownRadioItem>
-        </DropdownRadioGroup>
-      </DropdownContent>
+            {direction === "descending" ? (
+              <Dropdown.ItemIndicator type="checkmark" />
+            ) : null}
+          </Dropdown.Item>
+        </Dropdown.Menu>
+      </Dropdown.Popover>
     </Dropdown>
   )
 }
