@@ -71,6 +71,94 @@ const DIALOG_CLASSNAMES: Record<FileKind, string> = {
   other: "max-w-md",
 }
 
+function ImageStage({
+  fileName,
+  previewUrl,
+  url,
+  loading,
+}: {
+  fileName: string
+  previewUrl: string
+  url: string | null
+  loading: boolean
+}) {
+  const [decoded, setDecoded] = React.useState(false)
+  const [sharp, setSharp] = React.useState(false)
+  const [broken, setBroken] = React.useState(false)
+  const previewRef = React.useRef<HTMLImageElement>(null)
+
+  React.useEffect(() => {
+    if (!url || url === previewUrl) return
+    let cancelled = false
+    const image = new Image()
+    image.onload = () => {
+      if (!cancelled) setDecoded(true)
+    }
+    image.onerror = () => {
+      if (!cancelled) setBroken(true)
+    }
+    image.src = url
+    return () => {
+      cancelled = true
+    }
+  }, [previewUrl, url])
+
+  React.useEffect(() => {
+    if (!url || url !== previewUrl) return
+    const node = previewRef.current
+    if (node?.complete && node.naturalWidth > 0) setDecoded(true)
+  }, [previewUrl, url])
+
+  React.useEffect(() => {
+    if (!decoded || broken) return
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setSharp(true)
+      return
+    }
+    let inner = 0
+    const outer = requestAnimationFrame(() => {
+      inner = requestAnimationFrame(() => setSharp(true))
+    })
+    return () => {
+      cancelAnimationFrame(outer)
+      cancelAnimationFrame(inner)
+    }
+  }, [broken, decoded])
+
+  const clear = broken || (!loading && !url)
+  const showSharp = sharp || clear
+  const frame =
+    "absolute inset-0 m-auto max-h-full max-w-full object-contain transition-[filter,transform] duration-700 ease-out motion-reduce:scale-100 motion-reduce:blur-none motion-reduce:transition-none"
+  const soft = showSharp
+    ? "scale-100 blur-none"
+    : "scale-[1.06] blur-lg motion-reduce:scale-100 motion-reduce:blur-none"
+
+  return (
+    <div className="relative size-full overflow-hidden">
+      <img
+        ref={previewRef}
+        src={previewUrl}
+        alt={url && decoded && !broken && url !== previewUrl ? "" : fileName}
+        className={cn(
+          frame,
+          soft,
+          url !== previewUrl && showSharp && decoded && !broken && "invisible"
+        )}
+        onLoad={() => {
+          if (url && url === previewUrl) setDecoded(true)
+        }}
+      />
+      {url && decoded && !broken && url !== previewUrl ? (
+        <img
+          src={url}
+          alt={fileName}
+          className={cn(frame, soft, clear && "transition-none")}
+        />
+      ) : null}
+    </div>
+  )
+}
+
 function ViewerFallback() {
   return (
     <div className="flex h-full items-center justify-center">
@@ -260,6 +348,7 @@ export function FileViewerDialog({
   onPreviousAction,
   onNextAction,
   loading = false,
+  previewUrl = null,
 }: {
   file: FileSystemFileItem | null
   url: string | null
@@ -274,6 +363,11 @@ export function FileViewerDialog({
   onNextAction?: () => void
   /** True while the next item's URL is still resolving. */
   loading?: boolean
+  /**
+   * Thumbnail already on screen. Images open on this, blurred, until `url`
+   * has decoded.
+   */
+  previewUrl?: string | null
   /** Omitted for read-only buckets, which hides the edit control. */
   onSaveAction?: (
     file: FileSystemFileItem,
@@ -329,7 +423,15 @@ export function FileViewerDialog({
   const isMedia = kind === "image" || kind === "video" || kind === "audio"
 
   const body =
-    loading && !url ? (
+    kind === "image" && previewUrl ? (
+      <ImageStage
+        key={previewUrl}
+        fileName={fileName}
+        previewUrl={previewUrl}
+        url={url}
+        loading={loading}
+      />
+    ) : loading && !url ? (
       <ViewerFallback />
     ) : url ? (
       <ViewerBody
@@ -356,7 +458,11 @@ export function FileViewerDialog({
       {open && file ? (
         <DialogContent
           showCloseButton={kind === "other"}
-          className={cn("overflow-hidden", DIALOG_CLASSNAMES[kind])}
+          className={cn(
+            "overflow-hidden",
+            DIALOG_CLASSNAMES[kind],
+            kind === "image" && previewUrl && "h-[88vh] w-[min(96vw,64rem)]"
+          )}
         >
           <DialogTitle className="sr-only">{fileName}</DialogTitle>
           {kind === "other" ? (

@@ -325,6 +325,7 @@ export function MediaLibrary({
   const urlCache = React.useMemo(() => new Map<string, string>(), [])
   const [viewerIndex, setViewerIndex] = React.useState<number | null>(null)
   const [viewerUrl, setViewerUrl] = React.useState<string | null>(null)
+  const [viewerPreview, setViewerPreview] = React.useState<string | null>(null)
   const [viewerLoading, setViewerLoading] = React.useState(false)
   const viewerRequest = React.useRef(0)
 
@@ -436,7 +437,15 @@ export function MediaLibrary({
       if (!item) return
       const request = ++viewerRequest.current
       const file = toFile(item)
+      const shown = document.querySelector(
+        `[data-media-key="${CSS.escape(item.key)}"] img`
+      )
+      const preview =
+        item.kind === "image" && shown instanceof HTMLImageElement
+          ? shown.currentSrc || shown.src || null
+          : null
       setViewerIndex(index)
+      setViewerPreview(preview)
       setViewerUrl(null)
       setViewerLoading(true)
       onOpenAction?.(file, null)
@@ -552,6 +561,7 @@ export function MediaLibrary({
       <FileViewerDialog
         file={viewerItem ? toFile(viewerItem) : null}
         url={viewerUrl}
+        previewUrl={viewerPreview}
         loading={viewerLoading}
         open={viewerIndex !== null}
         onOpenChangeAction={(next) => {
@@ -559,6 +569,7 @@ export function MediaLibrary({
             viewerRequest.current += 1
             setViewerIndex(null)
             setViewerUrl(null)
+            setViewerPreview(null)
             setViewerLoading(false)
           }
         }}
