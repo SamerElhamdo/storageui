@@ -12,6 +12,7 @@ import type {
 } from "@/lib/storage/media"
 import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { ImageThumbnailPreview } from "@/components/explorer/image-thumbnail-preview"
 import type { FileSystemFileItem } from "@/components/explorer/types"
@@ -82,19 +83,19 @@ function ContentsChart({ summary }: { summary: MediaSummary }) {
     {
       key: "image" as const,
       label: t("images"),
-      bar: "bg-sky-600 dark:bg-sky-500",
+      bar: "bg-foreground/70",
       ...summary.image,
     },
     {
       key: "video" as const,
       label: t("videos"),
-      bar: "bg-amber-600 dark:bg-amber-500",
+      bar: "bg-foreground/45",
       ...summary.video,
     },
     {
       key: "other" as const,
       label: t("other"),
-      bar: "bg-muted-foreground/45",
+      bar: "bg-foreground/25",
       ...summary.other,
     },
   ]
@@ -103,24 +104,41 @@ function ContentsChart({ summary }: { summary: MediaSummary }) {
   return (
     <section
       aria-label={t("contents")}
-      className="shrink-0 border-b px-4 py-3"
+      className="shrink-0 px-3 pt-2.5 pb-2"
       data-media-summary={`${summary.image.count}:${summary.video.count}:${summary.other.count}`}
     >
-      <div className="mb-2">
-        <h2 className="text-sm font-medium">{t("contents")}</h2>
-        <p className="text-xs text-muted-foreground">{t("contentsHint")}</p>
+      <div className="mb-1.5 flex min-w-0 items-baseline gap-2">
+        <h2 className="shrink-0 text-xs text-muted-foreground">
+          {t("contents")}
+        </h2>
+        <p
+          className="min-w-0 truncate text-[11px] text-muted-foreground/70"
+          title={t("contentsHint")}
+        >
+          {t("contentsHint")}
+        </p>
       </div>
-      <ul className="space-y-2">
+      <ul
+        className="grid gap-x-5 gap-y-1.5"
+        style={{
+          gridTemplateColumns: "repeat(auto-fit, minmax(11.5rem, 1fr))",
+        }}
+      >
         {rows.map((row) => (
-          <li key={row.key}>
-            <div className="mb-1 flex items-baseline justify-between gap-3 text-xs">
-              <span className="font-medium">{row.label}</span>
-              <span className="text-muted-foreground">
-                {t("fileCount", { count: row.count })} ·{" "}
+          <li key={row.key} className="min-w-0">
+            <div className="mb-1 flex items-baseline justify-between gap-2 text-[11px] leading-none">
+              <span className="truncate text-muted-foreground">
+                {row.label}
+              </span>
+              <span className="shrink-0 text-muted-foreground tabular-nums">
+                {t("fileCount", { count: row.count })}
+                <span aria-hidden className="px-1 text-muted-foreground/40">
+                  ·
+                </span>
                 {formatBytes(row.bytes)}
               </span>
             </div>
-            <div className="h-2 overflow-hidden rounded-full bg-muted">
+            <div className="h-1 overflow-hidden rounded-full bg-muted">
               <div
                 className={cn("h-full rounded-full", row.bar)}
                 style={{
@@ -135,6 +153,140 @@ function ContentsChart({ summary }: { summary: MediaSummary }) {
         ))}
       </ul>
     </section>
+  )
+}
+
+const tileGridStyle = {
+  gridTemplateColumns: "repeat(auto-fill, minmax(148px, 1fr))",
+} as const
+
+function MediaGridSkeleton() {
+  const t = useTranslations("Media")
+
+  return (
+    <div className="px-2 py-1" aria-busy="true">
+      <div className="flex items-baseline justify-between px-1 py-2">
+        <Skeleton className="h-4 w-28" />
+        <Skeleton className="h-3 w-10" />
+      </div>
+      <div className="grid items-start gap-0.5" style={tileGridStyle}>
+        {Array.from({ length: 12 }, (_, index) => (
+          <Skeleton key={index} className="aspect-square rounded-none" />
+        ))}
+      </div>
+      <span className="sr-only">{t("loading")}</span>
+    </div>
+  )
+}
+
+type MediaTileProps = {
+  item: MediaListItem
+  index: number
+  connectionId?: string
+  thumbnailHandle?: string | null
+  getFileUrl?: (file: FileSystemFileItem) => Promise<string>
+  urlCache: Map<string, string>
+  onOpen: (index: number) => void
+  playLabel: string
+}
+
+function MediaTile({
+  item,
+  index,
+  connectionId,
+  thumbnailHandle,
+  getFileUrl,
+  urlCache,
+  onOpen,
+  playLabel,
+}: MediaTileProps) {
+  const [phase, setPhase] = React.useState<"pending" | "ready" | "error">(
+    "pending"
+  )
+  const [revealed, setRevealed] = React.useState(false)
+  const isImage = item.kind === "image" && Boolean(getFileUrl)
+  const arrived = revealed || phase === "error"
+  const stagger = `${(index % 6) * 40}ms`
+
+  React.useEffect(() => {
+    if (isImage) return
+    setPhase("ready")
+  }, [isImage, item.key])
+
+  React.useEffect(() => {
+    if (phase !== "ready") return
+    const frame = requestAnimationFrame(() => setRevealed(true))
+    return () => cancelAnimationFrame(frame)
+  }, [phase, item.key])
+
+  const onPreviewSettle = React.useCallback((status: "ready" | "error") => {
+    if (status === "error") {
+      setPhase("error")
+      setRevealed(true)
+      return
+    }
+    setPhase((current) => (current === "error" ? current : "ready"))
+  }, [])
+
+  return (
+    <button
+      type="button"
+      data-media-key={item.key}
+      data-media-kind={item.kind}
+      onClick={() => onOpen(index)}
+      className="group relative aspect-square min-w-0 overflow-hidden bg-muted text-start outline-none focus-visible:z-10 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
+    >
+      <span
+        className={cn(
+          "pointer-events-none absolute inset-0 origin-center transition-[filter,transform] duration-700 ease-out motion-reduce:scale-100 motion-reduce:blur-none motion-reduce:transition-none",
+          arrived
+            ? "scale-100 blur-none"
+            : "scale-[0.96] blur-md motion-reduce:scale-100 motion-reduce:blur-none",
+          phase === "error" && "transition-none"
+        )}
+        style={
+          arrived && phase !== "error"
+            ? { transitionDelay: stagger }
+            : undefined
+        }
+      >
+        {isImage && getFileUrl ? (
+          <ImageThumbnailPreview
+            cacheKey={`${connectionId ?? ""}\u0000${item.path}`}
+            file={toFile(item)}
+            getFileUrl={getFileUrl}
+            urlCache={urlCache}
+            thumbnailHandle={thumbnailHandle}
+            widthHint={160}
+            onPreviewSettle={onPreviewSettle}
+          />
+        ) : (
+          <span className="block size-full bg-neutral-950" />
+        )}
+      </span>
+      <span className="pointer-events-none absolute inset-x-0 top-0 z-[1] bg-gradient-to-b from-black/80 via-black/45 to-transparent px-1.5 pt-1 pb-5 text-[11px] leading-tight font-medium text-white opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus:opacity-100 motion-reduce:transition-none">
+        <span className="line-clamp-2 [overflow-wrap:anywhere]">
+          {item.name}
+        </span>
+      </span>
+      {item.kind === "video" && arrived ? (
+        <span className="pointer-events-none absolute inset-0 z-[1] flex items-center justify-center text-white motion-reduce:transition-none">
+          <span className="flex size-9 items-center justify-center rounded-full bg-white/15">
+            <AppIcon
+              icon={PlayIcon}
+              className="size-5 fill-current"
+              aria-hidden
+            />
+          </span>
+          <span className="sr-only">{playLabel}</span>
+        </span>
+      ) : null}
+      {item.kind === "video" && arrived && item.durationSeconds ? (
+        <span className="pointer-events-none absolute right-1 bottom-1 z-[1] rounded bg-black/75 px-1 py-0.5 text-[11px] font-medium text-white tabular-nums">
+          {formatDuration(item.durationSeconds)}
+        </span>
+      ) : null}
+    </button>
   )
 }
 
@@ -171,7 +323,6 @@ export function MediaLibrary({
   const scrollerRef = React.useRef<HTMLDivElement>(null)
   const sentinelRef = React.useRef<HTMLDivElement>(null)
   const urlCache = React.useMemo(() => new Map<string, string>(), [])
-  const [columns, setColumns] = React.useState(4)
   const [viewerIndex, setViewerIndex] = React.useState<number | null>(null)
   const [viewerUrl, setViewerUrl] = React.useState<string | null>(null)
   const [viewerLoading, setViewerLoading] = React.useState(false)
@@ -279,25 +430,6 @@ export function MediaLibrary({
     [dateLocale, t]
   )
 
-  React.useEffect(() => {
-    const node = scrollerRef.current
-    if (!node) return
-    const measure = () => {
-      const styles = getComputedStyle(node)
-      const pad =
-        Number.parseFloat(styles.paddingLeft) +
-        Number.parseFloat(styles.paddingRight)
-      const width = Math.max(0, node.clientWidth - pad)
-      const tile = 148
-      const gap = 2
-      setColumns(Math.max(2, Math.floor((width + gap) / (tile + gap))))
-    }
-    measure()
-    const observer = new ResizeObserver(measure)
-    observer.observe(node)
-    return () => observer.disconnect()
-  }, [])
-
   const openAt = React.useCallback(
     (index: number) => {
       const item = items[index]
@@ -345,16 +477,14 @@ export function MediaLibrary({
 
       <div ref={scrollerRef} className="min-h-0 flex-1 overflow-y-auto">
         {error ? (
-          <div className="flex flex-col items-center justify-center gap-2 p-8 text-center">
+          <div className="flex h-full min-h-64 flex-col items-center justify-center gap-2 px-6 py-16 text-center">
             <h2 className="text-base font-semibold">{t("loadError")}</h2>
             <p className="max-w-md text-sm text-muted-foreground">{error}</p>
           </div>
         ) : loading && items.length === 0 ? (
-          <div className="flex h-40 items-center justify-center">
-            <Spinner />
-          </div>
+          <MediaGridSkeleton />
         ) : items.length === 0 ? (
-          <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
+          <div className="flex h-full min-h-64 flex-col items-center justify-center gap-3 px-6 py-16 text-center">
             <div className="flex size-12 items-center justify-center rounded-xl bg-muted text-muted-foreground">
               <AppIcon icon={Image01Icon} className="size-6" />
             </div>
@@ -366,62 +496,38 @@ export function MediaLibrary({
             </div>
           </div>
         ) : (
-          <div className="space-y-5 px-2 py-1" data-media-count={items.length}>
+          <div className="space-y-4 px-2 py-1" data-media-count={items.length}>
             {groups.map((group) => (
               <section key={group.key}>
-                <div className="sticky top-0 z-10 flex items-baseline justify-between gap-3 bg-background/95 px-1 py-2 backdrop-blur-sm">
-                  <h3 className="text-sm font-semibold tracking-tight">
-                    {labelFor(group.items[0]?.updatedAt)}
-                  </h3>
-                  <span className="shrink-0 text-xs text-muted-foreground">
-                    {t("dayCount", { count: group.items.length })}
-                  </span>
+                <div className="sticky top-0 z-20 -mb-3">
+                  <div className="flex items-baseline justify-between gap-3 bg-background px-1 pt-2.5 pb-1">
+                    <h3 className="text-sm font-semibold tracking-tight">
+                      {labelFor(group.items[0]?.updatedAt)}
+                    </h3>
+                    <span className="shrink-0 text-xs text-muted-foreground">
+                      {t("dayCount", { count: group.items.length })}
+                    </span>
+                  </div>
+                  <div
+                    aria-hidden
+                    className="pointer-events-none h-3 bg-gradient-to-b from-background to-transparent"
+                  />
                 </div>
-                <div
-                  className="grid gap-0.5"
-                  style={{
-                    gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
-                  }}
-                >
+                <div className="grid items-start gap-0.5" style={tileGridStyle}>
                   {group.items.map((item) => {
                     const index = items.indexOf(item)
                     return (
-                      <button
+                      <MediaTile
                         key={item.key}
-                        type="button"
-                        data-media-key={item.key}
-                        data-media-kind={item.kind}
-                        onClick={() => openAt(index)}
-                        className="relative aspect-square overflow-hidden bg-muted text-start outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
-                      >
-                        {item.kind === "image" && getFileUrl ? (
-                          <ImageThumbnailPreview
-                            cacheKey={`${connection?.id ?? ""}\u0000${item.path}`}
-                            file={toFile(item)}
-                            getFileUrl={getFileUrl}
-                            urlCache={urlCache}
-                            thumbnailHandle={thumbnailHandle}
-                            widthHint={160}
-                          />
-                        ) : (
-                          <span className="flex size-full items-center justify-center bg-neutral-950 text-white">
-                            <span className="flex size-9 items-center justify-center rounded-full bg-white/15">
-                              <AppIcon
-                                icon={PlayIcon}
-                                className="size-5 fill-current"
-                                aria-hidden
-                              />
-                            </span>
-                            <span className="sr-only">{t("play")}</span>
-                          </span>
-                        )}
-                        {item.kind === "video" && item.durationSeconds ? (
-                          <span className="pointer-events-none absolute right-1 bottom-1 rounded bg-black/75 px-1 py-0.5 text-[11px] font-medium text-white tabular-nums">
-                            {formatDuration(item.durationSeconds)}
-                          </span>
-                        ) : null}
-                        <span className="sr-only">{item.name}</span>
-                      </button>
+                        item={item}
+                        index={index}
+                        connectionId={connection?.id}
+                        thumbnailHandle={thumbnailHandle}
+                        getFileUrl={getFileUrl}
+                        urlCache={urlCache}
+                        onOpen={openAt}
+                        playLabel={t("play")}
+                      />
                     )
                   })}
                 </div>
@@ -430,10 +536,14 @@ export function MediaLibrary({
             {cursor ? (
               <div
                 ref={sentinelRef}
-                className="flex h-12 items-center justify-center"
+                className="flex h-10 items-center justify-center"
               >
-                {loadingMore ? <Spinner /> : null}
-                <span className="sr-only">{t("loadingMore")}</span>
+                {loadingMore ? (
+                  <Spinner
+                    className="size-3.5 text-muted-foreground"
+                    aria-label={t("loadingMore")}
+                  />
+                ) : null}
               </div>
             ) : null}
           </div>

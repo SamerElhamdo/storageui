@@ -379,6 +379,7 @@
     "yesterday": "Yesterday",
     "unknownDay": "Unknown date",
     "play": "Play video",
+    "loading": "Loading media…",
     "loadingMore": "Loading more…",
     "loadError": "Couldn't load media",
     "emptyTitle": "No photos or videos",

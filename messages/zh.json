@@ -379,6 +379,7 @@
     "yesterday": "昨天",
     "unknownDay": "未知日期",
     "play": "播放视频",
+    "loading": "正在加载媒体…",
     "loadingMore": "正在加载更多…",
     "loadError": "无法加载媒体",
     "emptyTitle": "没有照片或视频",

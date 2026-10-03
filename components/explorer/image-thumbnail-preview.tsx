@@ -19,6 +19,31 @@ type ImageThumbnailPreviewProps = {
   thumbnailHandle?: string | null
   /** Rendered width in CSS px. */
   widthHint?: number
+  /**
+   * Fires when the preview image has decoded, or when preview has given up.
+   * A failed thumbnail that falls back to the original does not settle yet.
+   */
+  onPreviewSettle?: (status: "ready" | "error") => void
+}
+
+function usePreviewSettle(
+  onPreviewSettle?: (status: "ready" | "error") => void
+) {
+  const ref = React.useRef(onPreviewSettle)
+  ref.current = onPreviewSettle
+  return React.useCallback((status: "ready" | "error") => {
+    ref.current?.(status)
+  }, [])
+}
+
+function previewImageProps(settle: (status: "ready" | "error") => void) {
+  return {
+    onLoad: () => settle("ready"),
+    ref: (node: HTMLImageElement | null) => {
+      // Cached and data URLs can be decoded before onLoad is attached.
+      if (node?.complete && node.naturalWidth > 0) settle("ready")
+    },
+  }
 }
 
 export function ImageThumbnailPreview({
@@ -28,7 +53,9 @@ export function ImageThumbnailPreview({
   urlCache,
   thumbnailHandle,
   widthHint,
+  onPreviewSettle,
 }: ImageThumbnailPreviewProps) {
+  const settle = usePreviewSettle(onPreviewSettle)
   const [thumbnailFailed, setThumbnailFailed] = React.useState(false)
 
   const width = widthHint
@@ -54,6 +81,7 @@ export function ImageThumbnailPreview({
         loading="lazy"
         decoding="async"
         className="size-full object-cover"
+        {...previewImageProps(settle)}
         onError={() => setThumbnailFailed(true)}
       />
     )
@@ -65,6 +93,7 @@ export function ImageThumbnailPreview({
       file={file}
       getFileUrl={getFileUrl}
       urlCache={urlCache}
+      onPreviewSettle={onPreviewSettle}
     />
   )
 }
@@ -85,10 +114,12 @@ function OriginalImagePreview({
   file,
   getFileUrl,
   urlCache,
+  onPreviewSettle,
 }: Pick<
   ImageThumbnailPreviewProps,
-  "cacheKey" | "file" | "getFileUrl" | "urlCache"
+  "cacheKey" | "file" | "getFileUrl" | "urlCache" | "onPreviewSettle"
 >) {
+  const settle = usePreviewSettle(onPreviewSettle)
   const knownUrl = file.url ?? urlCache.get(cacheKey) ?? null
   const [url, setUrl] = React.useState<string | null>(knownUrl)
   const [failed, setFailed] = React.useState(false)
@@ -130,6 +161,10 @@ function OriginalImagePreview({
     }
   }, [cacheKey, filePath, fileUrl, getFileUrl, urlCache])
 
+  React.useEffect(() => {
+    if (failed) settle("error")
+  }, [failed, settle])
+
   if (url && !failed) {
     return (
       <img
@@ -139,6 +174,7 @@ function OriginalImagePreview({
         loading="lazy"
         decoding="async"
         className="size-full object-cover"
+        {...previewImageProps(settle)}
         onError={() => {
           urlCache.delete(cacheKey)
           setFailed(true)
@@ -151,7 +187,11 @@ function OriginalImagePreview({
     return (
       <div
         aria-hidden="true"
-        className="size-full animate-pulse bg-muted motion-reduce:animate-none"
+        className={
+          onPreviewSettle
+            ? "size-full bg-muted"
+            : "size-full animate-pulse bg-muted motion-reduce:animate-none"
+        }
       />
     )
   }
