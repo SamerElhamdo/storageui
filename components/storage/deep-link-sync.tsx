@@ -38,7 +38,7 @@ export function findConnection(
  * so a reload or a back navigation does not jump there again.
  */
 export function DeepLinkSync() {
-  const { connections, setActiveConnection } = useConnections()
+  const { connections, hasHydrated, setActiveConnection } = useConnections()
   const setDeepLink = useNavStore((state) => state.setDeepLink)
   const setSection = useNavStore((state) => state.setSection)
   const done = React.useRef(false)
@@ -50,7 +50,8 @@ export function DeepLinkSync() {
       done.current = true
       return
     }
-    if (connections.length === 0) return // env connections still loading
+    // Local (saved) connections load first; wait until the env ones have merged in.
+    if (!hasHydrated) return
     done.current = true
     const connection = findConnection(connections, params)
     if (connection) {
@@ -69,7 +70,7 @@ export function DeepLinkSync() {
       "",
       `${window.location.pathname}${query ? `?${query}` : ""}${window.location.hash}`
     )
-  }, [connections, setActiveConnection, setDeepLink, setSection])
+  }, [connections, hasHydrated, setActiveConnection, setDeepLink, setSection])
 
   return null
 }

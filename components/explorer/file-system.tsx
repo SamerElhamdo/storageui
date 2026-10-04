@@ -902,7 +902,9 @@ export function FileSystem({
 
       const folder = index.folders.get(folderPath)
 
-      if (!folder?.hasChildren) return
+      // A folder opened straight from a link (`?bucket=&path=`) is not in the
+      // index yet — its parents were never listed — so list it anyway.
+      if (folder ? !folder.hasChildren : !folderPath) return
       if (index.children.get(folderPath)?.length) return
       if (requestedFoldersRef.current.has(folderPath)) return
 
